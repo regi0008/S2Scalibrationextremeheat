@@ -4,6 +4,9 @@
 #test period: 2002 (non-observed period)
 #based on temperature
 
+library(visualizeR)      #for spatialPlot(), temporalPlot()
+library(downscaleR)
+
 #observation via EOBS_Iberia_tas
 #a grid containing E_OBS daily data of mean temp.
 data(EOBS_Iberia_tas)
@@ -18,9 +21,7 @@ x <- subsetGrid(CFS_Iberia_tas, years = 1983:2001)
 #predictor in test period
 newdata <- subsetGrid(CFS_Iberia_tas, years = 2002)
 
-library(visualizeR)
-
-#function spatialPlot draws all members of CFS data in the same figure
+#spatialPlot() draws all members of CFS data in the same figure
 spatialPlot(climatology(y, clim.fun = list(FUN = mean, na.rm = T)), 
             backdrop.theme = "countries", 
             scales = list(draw = T))
@@ -31,12 +32,14 @@ cal <- biasCorrection(y = y,
                       newdata = x,
                       method = "eqm")
 #after calibrating, next is to validate results against the obs reference.
+
 #qucikDiagnostics() plots daily/annual series and the annual
 #correlation map of diff. grid objects
+
 #plot on the left is a time-series of the original simulation (in red)
 #calibrated simulation (in blue), observation (in black)
 #plot on the right is the quantile-quantile plot,
-#showing the diff. in original and calibrated
+#showing the diff. in original and calibrated and effect of the applied method
 loc <- c(-5, 42)
 quickDiagnostics(y, x, cal, location = loc)
 
@@ -64,8 +67,14 @@ cal2 <- biasCorrection(y = y,
                        method = "eqm")
 
 #show the spread of the spatial mean of the ensemble
-temporalPlot(y, x, newdata, cal1, cols = c("black", "red", "red", "blue"))
-#and show the effect of the correction
-temporalPlot(newdata, cal1, cols = c("red", "blue"))
-#lastly a comparison between the two BC methods
-temporalPlot(cal1, cal2, cols = c("blue", "green"))
+#plot the data used for calibration and out-of-sample series (corrected with 'eqm' method and non-corrected)
+temporalPlot(y, x, newdata, cal2, cols = c("black", "yellow", "red", "purple"),
+             xyplot.custom = list(ylim = c(-4,16)))
+
+#and show the effect of the correction (by only plotting year 2002)
+temporalPlot(newdata, cal2, cols = c("red", "purple"),
+             xyplot.custom = list(ylim = c(-2,16)))
+
+#lastly a comparison between the two BC methods - cal1-scaling and cal2-eqm in this example
+temporalPlot(cal1, cal2, cols = c("blue", "purple"),
+             xyplot.custom = list(ylim = c(-2,16)))
