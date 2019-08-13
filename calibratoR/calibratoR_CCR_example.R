@@ -1,20 +1,20 @@
-#climate conserving recalibration example
+#climate convering recalibration example
 
 library(loadeR)
 library(downscaleR)
 library(transformeR)
 library(visualizeR)
 library(calibratoR)
-library(loadeR.ECOMS)
+library(loadeR.2nc)
 library(SpecsVerification)
 
-#issue: need to constrain domain
 #loading datasets of boreal winter temp over Iberia
-#seasonal forecasts
+#seasonal forecasts CFS
 data(CFS_Iberia_tas)
-fst <- subsetGrid(CFS_Iberia_tas, lonLim = c(-10,10), latLim = c(30,45), years = 1983:2001)
-#fcst = CFS_Iberia_tas
-#observational data
+fcst = CFS_Iberia_tas
+#issue: need to constrain domain
+fcst <- subsetGrid(CFS_Iberia_tas, lonLim = c(-10,10), latLim = c(30,45), years = 1983:2001)
+#observational data NCEP
 data(NCEP_Iberia_tas)
 obs = NCEP_Iberia_tas
 
@@ -27,11 +27,34 @@ fcst <- interpGrid(fcst, new.coordinates = getGrid(obs))
 #apply calibraton
 fcst_cal <- calCCR(fcst, obs, crossval = TRUE, apply.to = "all")
 
-#error probably is here!!!!!
-#plot climo
-spatialPlot(makeMultiGrid(climatology(obs), climatology(fcst, by.member = FALSE), 
-                          climatology(fcst_cal, by.member = FALSE)),
-                          backdrop.theme = "coastline",
-                          layout = c(3, 1),
-                          names.attr = c("NCEP", "CFS (raw)", "CFS (calibrated)"))
-#find out how to download as gridded data
+#plot climo and call it calibrated_LM
+calibrated_CCR <- spatialPlot(makeMultiGrid(climatology(obs),
+                                           climatology(fcst, by.member = FALSE), 
+                                           climatology(fcst_cal, by.member = FALSE)),
+                             backdrop.theme = "coastline",
+                             layout = c(3, 1),
+                             names.attr = c("NCEP", "CFS (raw)", "CFS (calibrated)"))
+
+#download / load as gridded data
+
+#str(calibrated_CCR)
+
+#data(calibrated_CCR)
+#name of output file
+fileName <- "cal_CCR_gridded.nc"
+
+#include a global attribute:
+globalAttributeList <- list("institution" = "SantanderMetGroup, http://www.meteo.unican.es/")
+
+#include two variable attribute:
+varAttributeList <- list(var_attr1 = "one_attribute", var_attr2 = "another_attribute")
+
+#create file
+grid2nc(calibrated_CCR,
+        NetCDFOutFile = fileName,
+        missval = 1e20,
+        prec = "float",
+        globalAttributes = globalAttributeList,
+        varAttributes = varAttributeList,
+        shuffle = FALSE)
+

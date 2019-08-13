@@ -5,13 +5,13 @@ library(downscaleR)
 library(transformeR)
 library(visualizeR)
 library(calibratoR)
-library(loadeR.ECOMS)
+library(loadeR.2nc)
 library(SpecsVerification)
 
 #loading datasets of boreal winter temp over Iberia
 #seasonal forecasts CFS
 data(CFS_Iberia_tas)
-#fcst = CFS_Iberia_tas
+fcst = CFS_Iberia_tas
 #issue: need to constrain domain
 fcst <- subsetGrid(CFS_Iberia_tas, lonLim = c(-10,10), latLim = c(30,45), years = 1983:2001)
 #observational data NCEP
@@ -27,11 +27,33 @@ fcst <- interpGrid(fcst, new.coordinates = getGrid(obs))
 #apply calibraton
 fcst_cal <- calLM(fcst, obs, crossval = TRUE, apply.to = "all")
 
-#plot climo
-spatialPlot(makeMultiGrid(climatology(obs),
+#plot climo and call it calibrated_LM
+calibrated_LM <- spatialPlot(makeMultiGrid(climatology(obs),
                           climatology(fcst, by.member = FALSE), 
                           climatology(fcst_cal, by.member = FALSE)),
             backdrop.theme = "coastline",
             layout = c(3, 1),
             names.attr = c("NCEP", "CFS (raw)", "CFS (calibrated)"))
-#find out how to download as gridded data
+
+#download / load as gridded data
+
+#str(calibrated_LM)
+
+#data(calibrated_LM)
+#name of output file
+fileName <- "cal_LM_gridded.nc"
+
+#include a global attribute:
+globalAttributeList <- list("institution" = "SantanderMetGroup, http://www.meteo.unican.es/")
+
+#include two variable attribute:
+varAttributeList <- list(var_attr1 = "one_attribute", var_attr2 = "another_attribute")
+
+#create file
+#grid2nc(calibrated_LM,
+#                      NetCDFOutFile = fileName,
+#                      missval = 1e20,
+#                      prec = "float",
+#                      globalAttributes = globalAttributeList,
+#                      varAttributes = varAttributeList,
+#                      shuffle = FALSE)
