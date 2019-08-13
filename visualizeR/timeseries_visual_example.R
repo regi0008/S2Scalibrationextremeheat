@@ -14,22 +14,28 @@ library(CSTools)
 data(CFS_Iberia_tas)
 data(EOBS_Iberia_tas)
 
-#combind plot
-a <- subsetGrid(CFS_Iberia_tas, years = 1995:2000)
-b <- subsetGrid(EOBS_Iberia_tas, years = 1995:2000)
-temporalPlot("EOBS" = b, "CFS" = a)
+#combind plot with members (CFS) and without members (EOBS)
+a <- subsetGrid(CFS_Iberia_tas, years = 1985:1992)
+b <- subsetGrid(EOBS_Iberia_tas, years = 1985:1992)
+temporalPlot("EOBS" = b, "CFS" = a,
+             show.na=TRUE,
+             xyplot.custom = list(ylim = c(-5,15)))
 
-#consider a narrower time interval
 data(VALUE_Iberia_tas)
 value <- subsetGrid(VALUE_Iberia_tas, years = 1988:1990)
-temporalPlot("EOBS" = b, "CFS" = a, "VALUE" = value, lwd = 2,
-             xyplot.custom = list(main="winter temp",
-                                  ylab = "Celcius", ylim = c(-2,20)))
+temporalPlot("EOBS" = b, "CFS" = a,
+             "VALUE" = value, lwd = 0.9,
+             aggr.spatial = list(FUN = min, na.rm = TRUE),
+             show.na=TRUE,
+             xyplot.custom = list(main="winter temperature",
+                                  ylab = "Celcius", ylim = c(-20,12)))
+                                  
 
 #plot a single location only
 a1 <- subsetGrid(a, lonLim = 2, latLim = 42)
 b1 <- subsetGrid(b, lonLim = 2, latLim = 42)
 
 temporalPlot("EOBS" = b1, "CFS" = a1,
-             cols = c("green", "blue"), show.na=TRUE,
-             xyplot.custom = list(main = "winter temp", ylab = "Celsius"))
+             cols = c("purple", "yellow"),
+             show.na=TRUE,
+             xyplot.custom = list(main = "winter temperature", ylab = "Celsius", ylim = c(-10,15)))

@@ -1,7 +1,6 @@
 #Example: 2018_visualizeR_EMS.pdf
 #visualizeR: communication and visualization of
 #uncertainty in seasonal climate prediction
-#hello
 
 library(devtools)
 library(loadeR)
@@ -42,13 +41,14 @@ subtitle <- sprintf("Reference date: NCEP; Hindcast: CFS (%d members); %d-%d",
                     getYearsAsINDEX(hindcast)[1],
                     tail(getYearsAsINDEX(hindcast),1))
 
-#for this tercile plot, red = upper tercile, blue = lower, yellow = mid.
+#for this tercile plot
+#red = upper tercile, blue = lower, yellow = mid.
 bubblePlot(hindcast, obs, forecast = forecast,
            bubble.size = 1,
            subtitle = subtitle,
            size.as.probability = FALSE,
            score = FALSE)
-
+#-------------------------------
 #for the same spatial plot but focusing on quality of forecast,
 #we can set argument size.as.probability = TRUE to
 #get probability of the most likely tercile!!!
@@ -57,28 +57,29 @@ bubblePlot(hindcast, obs, forecast = forecast,
            subtitle = subtitle,
            size.as.probability = TRUE,
            score = FALSE)
-
+#-------------------------------
 #ROCSS aims to show diff. levels of transparency proportional
 #to the ROCSS value in each grid point.
 #We can set the argument score = TRUE for this.
-#In the legend, red = above (size: 100% likelihood), blue = below (50%), yellow = normal(75%)
+#In the legend, red = above (size: 100% likelihood), blue = below (size: 50% likelihood), yellow = normal(size: 75% likelihood)
 bubblePlot(hindcast, obs, forecast = forecast,
            bubble.size = 1,
            subtitle = subtitle,
            size.as.probability = TRUE,
            score = TRUE)
-
-#to mask out areas where the forecast cannot be trusted
+#-------------------------------
+#Previous plots have many grid points corresponding to areas where forecasting system exhibits few/no skill at all.
+#Better to mask out areas where the forecast cannot be trusted and focus on areas that have more confidence
+#Focus is on reliable areas.
 #set ROCSS score.range inside bubblePlot().
-#allow user to focus on areas that have more confidence
 bubblePlot(hindcast, obs, forecast = forecast,
-           bubble.size = 1,
+           bubble.size = 3,
            subtitle = subtitle,
            size.as.probability = TRUE,
            score = TRUE,
            score.range = c(0.5,1))
-
-#Cropping to a specific region, e.g. Southeast Asia region????
+#-------------------------------
+#Cropping to a specific region, e.g. Southeast Asia region
 crop.sea <- function(x) subsetGrid(x, lonLim = c(90, 135), latLim= c(-25,25))
 hindcast.sea <- crop.sea(hindcast)
 forecast.sea <- crop.sea(forecast)
@@ -86,26 +87,37 @@ obs.sea <- crop.sea(obs)
 
 #then plot the following bubble plot for that specific region:
 bubblePlot(hindcast.sea, obs.sea, forecast = forecast.sea,
-           bubble.size = 1,
+           bubble.size = 2,
            subtitle = subtitle,
            size.as.probability = TRUE,
            score = TRUE)
 
-#TERCILE PLOTS - use tercilePlot()
+#TERCILE PLOTS
+#use tercilePlot()
 tercilePlot(hindcast.sea, obs.sea, forecast = forecast.sea, subtitle = subtitle)
 
 #USING TERCILE PLOTS CONSIDERING FORECAST OF A SPECIFIC YEAR OF THE FORECASTS
-#E.G. YEAR = 1998
-#set forecast argument = NULL, and then
-#select your target hindcast year as the hindcast of the forecast 
+#set forecast argument = NULL, and then select your target hindcast year as the hindcast of the forecast 
 #"year.target = 1998"
 tercilePlot(hindcast.sea, obs.sea, forecast = NULL, year.target = 1998, subtitle = subtitle)
-
+#-------------------------------
 #TERCILE BAR PLOTS - use tercileBarplot()
+#score.threshold argument reprsents the threshold to remark high positive score values in the figure
+#plot for winter 2016 (forecast data)
 tercileBarplot(hindcast.sea, obs.sea, forecast = forecast.sea,
                score.threshold = 0.6,
                subtitle = subtitle)
 
+#plot for winter 2002 (selected from the hindcast)
+year.target <- 2002
+subtitle_year.target <- sprintf("Reference data: NCEP; Hindcast: CFS (%d members); %d-%d (except %d)",
+                                length(hindcast$Members),
+                                getYearsAsINDEX(hindcast)[1],
+                                tail(getYearsAsINDEX(hindcast),1), year.target)
+tercileBarplot(hindcast.sea, obs.sea, year.target = year.target,
+               score.threshold = 0.6,
+               subtitle = subtitle_year.target)
+#-------------------------------
 #RELIABILITY CATEGORIES - use reliabilityCategories()
 #it computes reliability categories for probabilistic forecasts
 #n.bins = no. of probability bins considered
