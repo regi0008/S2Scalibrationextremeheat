@@ -53,12 +53,12 @@ spatialPlot(climatology(cal))
 #of the seasonal forecasting models
 tercilePlot(CFS_Iberia_tas, obs = EOBS_Iberia_tas, year.target = 2002, color.pal = "ypb")
 
-#try between "scaling" and "eqm" method of bias correction to bias correct out-of-sample data (newdata, period: 2002)
-#first method: scaling
+#try between "variance" and "eqm" method of bias correction to bias correct out-of-sample data (newdata, period: 2002)
+#first method: Variance
 cal1 <- biasCorrection(y = y,
                        x = x,
                        newdata = newdata, 
-                       method = "scaling",
+                       method = "variance",
                        scaling.type = "multiplicative")
 #second method: eqm
 cal2 <- biasCorrection(y = y,
