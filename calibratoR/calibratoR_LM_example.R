@@ -6,6 +6,7 @@ library(transformeR)
 library(visualizeR)
 library(calibratoR)
 library(loadeR.2nc)
+library(ncdf4)
 library(SpecsVerification)
 
 #loading datasets of boreal winter temp over Iberia
@@ -28,7 +29,8 @@ fcst <- interpGrid(fcst, new.coordinates = getGrid(obs))
 fcst_cal <- calLM(fcst, obs, crossval = TRUE, apply.to = "all")
 
 #plot climo and call it calibrated_LM
-calibrated_LM <- spatialPlot(makeMultiGrid(climatology(obs),
+#calibrated_LM <- 
+spatialPlot(makeMultiGrid(climatology(obs),
                           climatology(fcst, by.member = FALSE), 
                           climatology(fcst_cal, by.member = FALSE)),
             backdrop.theme = "coastline",
@@ -41,13 +43,13 @@ calibrated_LM <- spatialPlot(makeMultiGrid(climatology(obs),
 
 #data(calibrated_LM)
 #name of output file
-fileName <- "cal_LM_gridded.nc"
+#fileName <- "cal_LM_gridded.nc"
 
 #include a global attribute:
-globalAttributeList <- list("institution" = "SantanderMetGroup, http://www.meteo.unican.es/")
+#globalAttributeList <- list("institution" = "SantanderMetGroup, http://www.meteo.unican.es/")
 
 #include two variable attribute:
-varAttributeList <- list(var_attr1 = "one_attribute", var_attr2 = "another_attribute")
+#varAttributeList <- list(var_attr1 = "one_attribute", var_attr2 = "another_attribute")
 
 #create file
 #grid2nc(calibrated_LM,

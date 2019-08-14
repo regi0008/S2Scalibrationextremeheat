@@ -6,13 +6,14 @@ library(transformeR)
 library(visualizeR)
 library(calibratoR)
 library(loadeR.2nc)
+library(ncdf4)
 library(SpecsVerification)
 
 #loading datasets of boreal winter temp over Iberia
 #seasonal forecasts CFS
 data(CFS_Iberia_tas)
 fcst = CFS_Iberia_tas
-#issue: need to constrain domain
+#issue solved: need to constrain domain
 fcst <- subsetGrid(CFS_Iberia_tas, lonLim = c(-10,10), latLim = c(30,45), years = 1983:2001)
 #observational data NCEP
 data(NCEP_Iberia_tas)
@@ -27,18 +28,19 @@ fcst <- interpGrid(fcst, new.coordinates = getGrid(obs))
 #apply calibraton
 fcst_cal <- calCCR(fcst, obs, crossval = TRUE, apply.to = "all")
 
-#plot climo and call it calibrated_LM
+#plot climo and call it calibrated_CCR
 calibrated_CCR <- spatialPlot(makeMultiGrid(climatology(obs),
-                                           climatology(fcst, by.member = FALSE), 
-                                           climatology(fcst_cal, by.member = FALSE)),
+                                            climatology(fcst, by.member = FALSE), 
+                                            climatology(fcst_cal, by.member = FALSE)),
                              backdrop.theme = "coastline",
                              layout = c(3, 1),
                              names.attr = c("NCEP", "CFS (raw)", "CFS (calibrated)"))
 
-#download / load as gridded data
+print(calibrated_CCR)
 
 #str(calibrated_CCR)
 
+#download / load as gridded data
 #data(calibrated_CCR)
 #name of output file
 fileName <- "cal_CCR_gridded.nc"
@@ -56,5 +58,10 @@ grid2nc(calibrated_CCR,
         prec = "float",
         globalAttributes = globalAttributeList,
         varAttributes = varAttributeList,
-        shuffle = FALSE)
+        shuffle = TRUE,
+        verbose = TRUE)
 
+#nc_create(calibrated_CCR,
+#          vars,
+#          force_v4 = TRUE,
+#          verbose = TRUE)
