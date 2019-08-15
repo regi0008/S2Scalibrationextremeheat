@@ -29,19 +29,14 @@ fcst <- interpGrid(fcst, new.coordinates = getGrid(obs))
 fcst_cal <- calCCR(fcst, obs, crossval = TRUE, apply.to = "all")
 
 #plot climo and call it calibrated_CCR
-calibrated_CCR <- spatialPlot(makeMultiGrid(climatology(obs),
-                                            climatology(fcst, by.member = FALSE), 
-                                            climatology(fcst_cal, by.member = FALSE)),
-                             backdrop.theme = "coastline",
-                             layout = c(3, 1),
-                             names.attr = c("NCEP", "CFS (raw)", "CFS (calibrated)"))
+spatialPlot(makeMultiGrid(climatology(obs),
+                          climatology(fcst, by.member = FALSE), 
+                          climatology(fcst_cal, by.member = FALSE)),
+            backdrop.theme = "coastline",
+            layout = c(3, 1),
+            names.attr = c("NCEP", "CFS (raw)", "CFS (calibrated)"))
 
-print(calibrated_CCR)
-
-#str(calibrated_CCR)
-
-#download / load as gridded data
-#data(calibrated_CCR)
+#download / load as gridded data into local folder
 #name of output file
 fileName <- "cal_CCR_gridded.nc"
 
@@ -52,7 +47,7 @@ globalAttributeList <- list("institution" = "SantanderMetGroup, http://www.meteo
 varAttributeList <- list(var_attr1 = "one_attribute", var_attr2 = "another_attribute")
 
 #create file
-grid2nc(calibrated_CCR,
+grid2nc(fcst_cal,
         NetCDFOutFile = fileName,
         missval = 1e20,
         prec = "float",
@@ -60,8 +55,3 @@ grid2nc(calibrated_CCR,
         varAttributes = varAttributeList,
         shuffle = TRUE,
         verbose = TRUE)
-
-#nc_create(calibrated_CCR,
-#          vars,
-#          force_v4 = TRUE,
-#          verbose = TRUE)
