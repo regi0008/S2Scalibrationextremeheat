@@ -1,4 +1,4 @@
-#climate convering recalibration example
+#climate conserving recalibration example
 
 library(loadeR)
 library(downscaleR)
@@ -28,7 +28,7 @@ fcst <- interpGrid(fcst, new.coordinates = getGrid(obs))
 #apply calibraton
 fcst_cal <- calCCR(fcst, obs, crossval = TRUE, apply.to = "all")
 
-#plot climo and call it calibrated_CCR
+#plot climo
 spatialPlot(makeMultiGrid(climatology(obs),
                           climatology(fcst, by.member = FALSE), 
                           climatology(fcst_cal, by.member = FALSE)),
