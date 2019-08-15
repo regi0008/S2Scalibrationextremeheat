@@ -6,6 +6,7 @@
 
 library(visualizeR)      #for spatialPlot(), temporalPlot()
 library(downscaleR)
+library(loadeR.2nc)      #for downloading gridded dataset (scroll below to see)
 
 #observation via EOBS_Iberia_tas
 #a grid containing E_OBS daily data of mean temp.
@@ -18,7 +19,7 @@ y <- subsetGrid(EOBS_Iberia_tas, years = 1983:2001)
 data(CFS_Iberia_tas)
 x <- subsetGrid(CFS_Iberia_tas, years = 1983:2001)
 
-#predictor in test period
+#predictor in test period (non-observed period)
 newdata <- subsetGrid(CFS_Iberia_tas, years = 2002)
 
 #spatialPlot() draws all members of CFS data in the same figure
@@ -31,6 +32,29 @@ cal <- biasCorrection(y = y,
                       x = x,
                       newdata = x,
                       method = "eqm")
+#--------------------------------
+#download / load as gridded data into local folder for method = variance "eqm"
+#name of output file
+fileName <- "cal_eqm0_gridded.nc"
+
+#include a global attribute:
+globalAttributeList <- list("institution" = "SantanderMetGroup, http://www.meteo.unican.es/")
+
+#include two variable attribute:
+varAttributeList <- list(var_attr1 = "one_attribute", var_attr2 = "another_attribute")
+
+#create file
+grid2nc(cal,
+        NetCDFOutFile = fileName,
+        missval = 1e20,
+        prec = "float",
+        globalAttributes = globalAttributeList,
+        varAttributes = varAttributeList,
+        shuffle = TRUE,
+        verbose = TRUE)
+
+
+#--------------------------------
 #after calibrating, next is to validate results against the obs reference.
 
 #qucikDiagnostics() plots daily/annual series and the annual
@@ -66,6 +90,48 @@ cal2 <- biasCorrection(y = y,
                        newdata = newdata,
                        method = "eqm")
 
+#--------------------------------
+#download / load as gridded data into local folder for method = variance "MVA"
+#name of output file
+fileName <- "cal_variance_gridded.nc"
+
+#include a global attribute:
+globalAttributeList <- list("institution" = "SantanderMetGroup, http://www.meteo.unican.es/")
+
+#include two variable attribute:
+varAttributeList <- list(var_attr1 = "one_attribute", var_attr2 = "another_attribute")
+
+#create file
+grid2nc(cal1,
+        NetCDFOutFile = fileName,
+        missval = 1e20,
+        prec = "float",
+        globalAttributes = globalAttributeList,
+        varAttributes = varAttributeList,
+        shuffle = TRUE,
+        verbose = TRUE)
+#--------------------------------
+#download / load as gridded data into local folder for method = emphirical quantile mapping "eqm"
+#name of output file
+fileName <- "cal_eqm_gridded.nc"
+
+#include a global attribute:
+globalAttributeList <- list("institution" = "SantanderMetGroup, http://www.meteo.unican.es/")
+
+#include two variable attribute:
+varAttributeList <- list(var_attr1 = "one_attribute", var_attr2 = "another_attribute")
+
+#create file
+grid2nc(cal2,
+        NetCDFOutFile = fileName,
+        missval = 1e20,
+        prec = "float",
+        globalAttributes = globalAttributeList,
+        varAttributes = varAttributeList,
+        shuffle = TRUE,
+        verbose = TRUE)
+#--------------------------------
+#TEMPORAL PLOTS
 #show the spread of the spatial mean of the ensemble
 #plot the data used for calibration and out-of-sample series (corrected with 'eqm' method and non-corrected)
 temporalPlot(y, x, newdata, cal2, cols = c("black", "yellow", "red", "purple"),
