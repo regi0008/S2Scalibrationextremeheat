@@ -9,9 +9,12 @@ library(visualizeR)
 library(s2dverification)
 library(easyVerification)
 library(SpecsVerification)
+library(tidync)
+library(tidyr)
+library(dplyr)
 
 #for data access authentication
-#loginUDG(username = "uSeRnAmE_regi0008", password = "pAssWord")
+loginUDG(username = "uSeRnAmE_regi0008", password = "pAssWord")
 
 #NCEP Reanalysis SLP
 #url <- "http://meteo.unican.es/work/UDG/NCEP_psl_DJF_annual_1949_2010_LD.Rdata"
@@ -86,29 +89,33 @@ library(SpecsVerification)
 #            backdrop.theme = "coastline",
 #            main = "Mean DJF Temperature (1983-2010)")
 
+#-----------------------------------------------------------
+
 #Correlation Analysis
 #object cor contains correlation coefficients for each point.
 #need to convert list into array
 summary(NCEP_Iberia_tas)
 summary(CFS_Iberia_tas)
 
-obs <- NCEP_Iberia_tas[["Data"]]
-#obs_array <- array(as.numeric(unlist(obs)))
+obs <- NCEP_Iberia_tas[["Data"]]                 #type = double
+obs_array <- array(as.numeric(unlist(obs)))
+#obs_vector <- as.vector(obs)
 #dim(obs_array) = 86640
 
-fcst <- CFS_Iberia_tas[["Data"]]
-#fcst_array <- array(as.numeric(unlist(fcst)))
+fcst <- CFS_Iberia_tas[["Data"]]                 #type = double
+fcst_array <- array(as.numeric(unlist(fcst)))
+#fcst_vector <- as.vector(fcst)
 #dim(fst_array) = 2599200
 
 cor <- veriApply(verifun = "EnsCorr",
-                 fcst = fcst,
-                 obs = obs,
+                 fcst = fcst_array,
+                 obs = obs_array,
                  tdim = length(dim(fcst))-1,
                  ensdim = length(dim(fcst)))
 
 #above error:
-#Error in veriApply(verifun = "EnsCorr", fcst = fcst, obs = obs, tdim = length(dim(fcst)) -  : 
-#                     odims[-otdim] == dim(fcst)[-c(ensdim, tdim)] are not all TRUE
+#Error in veriApply(verifun = "EnsCorr", fcst = fcst_array, obs = obs_array,  : 
+#c(ensdim, tdim) <= nfdims are not all TRUE
 
 #easyVeri2grid is a bridging function that performs transformation
 #from the raw verification matrices produced by library(easyVerification)
@@ -129,3 +136,22 @@ spatialPlot(climatology(cor.grid),
 
 #above error:
 #Error in getDim(grid) : object 'cor.grid' not found
+#-----------------------------------------
+
+#since there is error with dimension/length between fcst and obs,
+#try with package "tidync" using hyper_filter(), hyper_array() etc.
+#read file NCEP_Iberia_tas_obs.nc
+#read file CFS_Iberia_tas_forecast.nc
+
+#hyper_array()/hyper_slice() function extracts raw data as a list of one or more arrays.
+#This can be the entire variable/s or after dimension-slicing using hyper_filter() expressions.
+
+filename_obs <- "NCEP_Iberia_tas_obs.nc"
+obs <- system.file("C:/Users/regin/Desktop/R", filename_obs, package = "tidync")
+extract_obs <- tidync(obs) %>%
+  hyper_slice(obs, select_var = "time")
+
+print(extract_obs)
+
+
+#-----------------------------------------
