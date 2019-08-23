@@ -5,6 +5,7 @@ library(visualizeR)
 library(calibratoR)
 library(ncdf4)
 library(SpecsVerification)
+library(abind)
 
 loadNcdf <- function(filePath, varname, tz = 'GMT', ...) {
   nc <- nc_open(filePath)
@@ -175,12 +176,12 @@ grepAndMatch <- function(x, table) {
 }
 
 ########## 
-dir <- "C:/users/Work/Desktop/Regine_project/data"
+dir <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
 fcst <- loadNcdf(file.path(dir, "2t_201902_Mar_rev.nc"), "tas")
 obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_rev.nc"), "tas")
 #apply calibraton
-fcst_cal <- calCCR(fcst, obs, crossval = TRUE, apply.to = "all")
+fcst_cal <- calMVA(fcst, obs, crossval = TRUE)
 
-#plot climo
-fcst_cal_fileName <- "fcst_cal.nc"
+fcst_cal_fileName <- "fcst_cal_MVA.nc"
 writeNcdf(fcst_cal, fcst_cal_fileName)
+
