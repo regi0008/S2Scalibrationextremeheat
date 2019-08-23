@@ -82,8 +82,8 @@ tercilePlot(CFS_Iberia_tas, obs = EOBS_Iberia_tas, year.target = 2002, color.pal
 cal1 <- biasCorrection(y = y,
                        x = x,
                        newdata = newdata, 
-                       method = "variance",
-                       scaling.type = "multiplicative")
+                       method = "variance")
+
 #second method: eqm
 cal2 <- biasCorrection(y = y,
                        x = x,
