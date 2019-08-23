@@ -181,11 +181,6 @@ fcst <- loadNcdf(file.path(dir, "2t_201902_Mar_rev.nc"), "tas")
 obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_rev.nc"), "tas")
 #apply calibraton
 
-#obs <- interpGrid(obs, new.coordinates = ,method = "neighbour")
-
-#below is for bias adjustment (BA) - mean/variance adjustment (MVA)
-#fcst_cal <- biasCorrection(obs, fcst, newdata = NULL, method = "variance")
-
 #below is for bias adjustment (BA) - empirical quantile mapping (EQM)
 fcst_cal <- biasCorrection(obs, fcst, newdata = NULL, method = "eqm")
 
