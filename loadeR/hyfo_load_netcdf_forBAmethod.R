@@ -177,17 +177,25 @@ grepAndMatch <- function(x, table) {
 
 ########## 
 dir <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
+#predictor:
 fcst <- loadNcdf(file.path(dir, "2t_201902_Mar_rev.nc"), "tas")
+#predictand:
 obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_rev.nc"), "tas")
+
+newdata <- subsetGrid(obs, years = 2016)
 
 #apply calibraton
 
 #below is for bias adjustment (BA) - empirical quantile mapping (EQM)
-fcst_cal <- biasCorrection(obs, fcst,
+#n.quantiles = length(fcst)?
+fcst_cal <- biasCorrection(y = obs, x = fcst,
+                           newdata = newdata,
                            method = "eqm",
-                           cross.val = "loo",
                            join.members = TRUE,
-                           n.quantiles = NULL)
+                           cross.val = "loo",
+                           n.quantiles = NULL,
+                           window = NULL,
+                           extrapolation = "constant")
 
 fcst_cal_fileName <- "fcst_cal_EQM.nc"
 writeNcdf(fcst_cal, fcst_cal_fileName)
