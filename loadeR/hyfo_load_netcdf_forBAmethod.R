@@ -179,10 +179,15 @@ grepAndMatch <- function(x, table) {
 dir <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
 fcst <- loadNcdf(file.path(dir, "2t_201902_Mar_rev.nc"), "tas")
 obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_rev.nc"), "tas")
+
 #apply calibraton
 
 #below is for bias adjustment (BA) - empirical quantile mapping (EQM)
-fcst_cal <- biasCorrection(obs, fcst, newdata = NULL, method = "eqm")
+fcst_cal <- biasCorrection(obs, fcst,
+                           method = "eqm",
+                           cross.val = "loo",
+                           join.members = TRUE,
+                           n.quantiles = NULL)
 
-fcst_cal_fileName <- "fcst_cal_mva.nc"
+fcst_cal_fileName <- "fcst_cal_EQM.nc"
 writeNcdf(fcst_cal, fcst_cal_fileName)
