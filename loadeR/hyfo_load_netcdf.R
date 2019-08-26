@@ -180,7 +180,7 @@ dir <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
 fcst <- loadNcdf(file.path(dir, "2t_201902_Mar_rev.nc"), "tas")
 obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_rev.nc"), "tas")
 #apply calibraton
-fcst_cal <- calCCR(fcst, obs, crossval = TRUE)
+fcst_cal <- calLM(fcst, obs, crossval = TRUE)
 
-fcst_cal_fileName <- "fcst_cal_CCR.nc"
+fcst_cal_fileName <- "fcst_cal_LR.nc"
 writeNcdf(fcst_cal, fcst_cal_fileName)
