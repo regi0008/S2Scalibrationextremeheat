@@ -6,6 +6,7 @@ library(calibratoR)
 library(ncdf4)
 library(SpecsVerification)
 library(abind)
+#library(loader.2nc)
 
 loadNcdf <- function(filePath, varname, tz = 'GMT', ...) {
   nc <- nc_open(filePath)
@@ -182,14 +183,15 @@ fcst <- loadNcdf(file.path(dir, "2t_201902_Mar_rev.nc"), "tas")
 #predictand:
 obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_rev.nc"), "tas")
 
-newdata <- subsetGrid(obs, years = 2016)
+#fcst <- subsetGrid(fcst, years = 1993:2016)
+#obs <- subsetGrid(obs, years = 1983:2016)
+#newdata <- subsetGrid(obs, years = 2016)
 
 #apply calibraton
 
 #below is for bias adjustment (BA) - empirical quantile mapping (EQM)
 #n.quantiles = length(fcst)?
 fcst_cal <- biasCorrection(y = obs, x = fcst,
-                           newdata = newdata,
                            method = "eqm",
                            join.members = TRUE,
                            cross.val = "loo",
