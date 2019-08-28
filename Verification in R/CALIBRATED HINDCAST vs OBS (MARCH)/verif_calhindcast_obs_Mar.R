@@ -193,14 +193,21 @@ obs <- loadNcdf(file.path(dir2, "2t_era5_Mar_1993_2016_format.nc"), "tas")
 
 #compute area under the ROC Curve via easyVerification package.
 #EnsRoca computes the area under the ROC curve given the observations.
-#tercile probabilities: let prob = 1:2/3
+#tercile probabilities: let prob = 1:2/3.. or c(1/3,2/3)
+#tdim = index of dimension with the different forecasts
+#ensdim = index of dimension with the different ensemble members
 roc <- veriApply(verifun = "EnsRoca",
                  fcst = fcst_cal$Data,
                  obs = obs$Data,
-                 prob = c(1/3,2/3))
+                 prob = 1:2/3)
 
+#ERROR MESSAGE FROM THIS LINE BELOW:
+#"Error in easyVeri2grid(easyVeri.mat = roc$cat3, obs.grid = obs, verifun = "EnsRoca") : 
+#XY coordinates and matrix dimensions do not match"
+#Dimension problem. To tackle above message, transpose roc$(whatever category)
 #plot ROC AREA for each tercile category
-upper.tercile <- easyVeri2grid(easyVeri.mat = roc$cat3,
+#obs.grid = the grid containing the verifying reference used
+upper.tercile <- easyVeri2grid(easyVeri.mat = t(roc$cat3),
                                obs.grid = obs,
                                verifun = "EnsRoca")
 
@@ -209,7 +216,7 @@ spatialPlot(upper.tercile,
             main = "ROC AREA (Above-normal) for March",
             color.theme = "YlOrRd")
 
-middle.tercile <- easyVeri2grid(easyVeri.mat = roc$cat2,
+middle.tercile <- easyVeri2grid(easyVeri.mat = t(roc$cat2),
                                 obs.grid = obs,
                                 verifun = "EnsRoca")
 
@@ -218,7 +225,7 @@ spatialPlot(middle.tercile,
             main = "ROC AREA (Near-normal) for March",
             color.theme = "YlOrRd")
 
-lower.tercile <- easyVeri2grid(easyVeri.mat = roc$cat1,
+lower.tercile <- easyVeri2grid(easyVeri.mat = t(roc$cat1),
                                obs.grid = obs,
                                verifun = "EnsRoca")
 
@@ -242,4 +249,19 @@ spatialPlot(lower.tercile,
 #COMPUTE CONTINUOUS RANKED PROBABILITY SCORE (CRPS)
 #via SpecsVerification
 
-#EnsCrps(fcst$Data, obs$Data, R.new = NA)
+#EnsCrps(fcst_cal$Data, obs$Data, R.new = NA)
+#------------------------------------------
+#COMPUTE RELIABILITY DIAGRAM
+#RELIABILITY CATEGORIES - use reliabilityCategories()
+#it computes reliability categories for probabilistic forecasts
+#n.bins = no. of probability bins considered
+#labels are respectively for the no. of events
+#cex0 = min. no of points shown in reliability diagram
+#cex.scale = scaling factor for points sizes in reliability diagram (see help)
+#realiable.sea <- reliabilityCategories(hindcast = fcst_cal,
+#                                       obs = obs,
+#                                       n.events = 3,
+#                                       labels = c("Below", "Average", "Above"),
+#                                       n.bins = 10,
+#                                       cex0 = 0.5,
+#                                       cex.scale = 20)
