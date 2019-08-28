@@ -197,6 +197,7 @@ roc <- veriApply(verifun = "EnsRoca",
                  tdim = 2)
 
 #plot ROC AREA for each tercile category
+#obs.grid = the grid containing the verifying reference used
 upper.tercile <- easyVeri2grid(easyVeri.mat = roc$cat3,
                                obs.grid = obs,
                                verifun = "EnsRoca")
