@@ -178,13 +178,16 @@ grepAndMatch <- function(x, table) {
 }
 #------------------------------------------
 #LOADING OF FILES THROUGH HYFO PACKAGE:
+#need to make sure dimensions of both files are the same:
+#calibrated hindcast: member, time, lat, lon
+#obs_formatted: time, lat, lon
 dir1 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat"
 #predictor (raw hincast):
 fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_CCR.nc"), "tas")
 
 dir2 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
 #predictand:
-obs <- loadNcdf(file.path(dir2, "2t_era5_Mar_1993_2016_rev.nc"), "tas")
+obs <- loadNcdf(file.path(dir2, "2t_era5_Mar_1993_2016_format.nc"), "tas")
 #------------------------------------------
 #VERIFICATION BETWEEN CALIBRATED HINDCAST AND OBSERVATIONS
 
@@ -194,9 +197,7 @@ obs <- loadNcdf(file.path(dir2, "2t_era5_Mar_1993_2016_rev.nc"), "tas")
 roc <- veriApply(verifun = "EnsRoca",
                  fcst = fcst_cal$Data,
                  obs = obs$Data,
-                 prob = c(1/3,2/3),
-                 ensdim = 1,
-                 tdim = 2)
+                 prob = c(1/3,2/3))
 
 #plot ROC AREA for each tercile category
 upper.tercile <- easyVeri2grid(easyVeri.mat = roc$cat3,
