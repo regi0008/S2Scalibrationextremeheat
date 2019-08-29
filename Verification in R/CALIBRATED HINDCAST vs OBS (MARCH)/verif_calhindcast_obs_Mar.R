@@ -248,6 +248,7 @@ spatialPlot(mg_ROC_Mar,
             main = "Area under the ROC curve",
             sub = "ECMWF 24 member - MARCH Calibrated Mean 2mT (1993-2016)")
 #------------------------------------------
+#not complete yet
 #COMPUTE BRIER SCORE (BS)
 #via library(verification)
 
@@ -271,6 +272,7 @@ crps(obs$Data, pred)
 #ign = ignorance score is generated in output as well
 #IGN = mean of ignorance score = 1.841349
 #------------------------------------------
+#not complete yet
 #COMPUTE RELIABILITY DIAGRAM
 #RELIABILITY CATEGORIES - use reliabilityCategories()
 #it computes reliability categories for probabilistic forecasts
