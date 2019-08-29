@@ -276,6 +276,10 @@ print(calculate_crps_fcst_cal_MVA)
 write.table(calculate_crps_fcst_cal_MVA, file = "calculate_crps_fcst_cal_MVA.csv", quote = FALSE, sep = ",")
 #------------------------------------------
 #not complete yet
+#error message:
+#Error in mat2Dto3Darray(as.matrix(ob.clim[i, , drop = F]), x = obs$xyCoords$x,  : 
+#                          Coordinates 'x' and 'y' must be given in ascending order
+#need to reverse the order of y = obs$xyCoords$y from -ve to +ve ??
 #COMPUTE RELIABILITY DIAGRAM
 #RELIABILITY CATEGORIES - use reliabilityCategories()
 #it computes reliability categories for probabilistic forecasts
