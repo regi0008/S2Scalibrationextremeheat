@@ -5,8 +5,10 @@ library(visualizeR)
 library(calibratoR)
 library(ncdf4)
 library(abind)
+library(s2dverification)
 library(SpecsVerification)
 library(easyVerification)
+library(verification)
 library(RColorBrewer)
 
 loadNcdf <- function(filePath, varname, tz = 'GMT', ...) {
@@ -235,21 +237,39 @@ spatialPlot(lower.tercile,
             color.theme = "YlOrRd")
 
 #ERROR BELOW WHEN TRYING TO MAKE MULTIGRID OF CAT1 TO CAT3
-#multigrid <- lapply(roc[1:3], "easyVeri2grid", obs)
-#mg_ROC_Mar <- makeMultiGrid(multigrid)
-#str(mg_ROC_Mar)
-#spatialPlot(mg_ROC_Mar,
-#            backdrop.theme = "countries",
-#            color.theme = "YlOrRd",
-#            names.attr = c("Lower tercile", "Middle tercile", "Upper tercile"),
-#            layout = c(3,1),
-#            main = "Area under the ROC curve",
-#            sub = "ECMWF 24 member - MARCH Calibrated Mean 2mT (1993-2016)")
+multigrid <- lapply(roc[1:3], "easyVeri2grid", obs)
+mg_ROC_Mar <- makeMultiGrid(multigrid)
+str(mg_ROC_Mar)
+spatialPlot(mg_ROC_Mar,
+            backdrop.theme = "countries",
+            color.theme = "YlOrRd",
+            names.attr = c("Lower tercile", "Middle tercile", "Upper tercile"),
+            layout = c(3,1),
+            main = "Area under the ROC curve",
+            sub = "ECMWF 24 member - MARCH Calibrated Mean 2mT (1993-2016)")
+#------------------------------------------
+#COMPUTE BRIER SCORE (BS)
+#via library(verification)
+
+#brier(obs, fcst_cal, baseline = NULL, bins = TRUE)
+
 #------------------------------------------
 #COMPUTE CONTINUOUS RANKED PROBABILITY SCORE (CRPS)
-#via SpecsVerification
+#via library(verification)
+#need to change fcst to a vector or matrix of the mean and sd
+#of a normal distribution
+m <- mean(fcst_cal$Data)
+sdev <- sd(fcst_cal$Data)
 
-#EnsCrps(fcst_cal$Data, obs$Data, R.new = NA)
+#put mean and sd into a dataframe to be inserted into crps().
+pred <- data.frame(m,sdev)
+#calculate score
+crps(obs$Data, pred)
+#output based on using fcst_cal_CCR as obs is calculated
+#crps is generated in output
+#CRPS = mean of crps = 0.7558377 is shown
+#ign = ignorance score is generated in output as well
+#IGN = mean of ignorance score = 1.841349
 #------------------------------------------
 #COMPUTE RELIABILITY DIAGRAM
 #RELIABILITY CATEGORIES - use reliabilityCategories()
@@ -258,10 +278,11 @@ spatialPlot(lower.tercile,
 #labels are respectively for the no. of events
 #cex0 = min. no of points shown in reliability diagram
 #cex.scale = scaling factor for points sizes in reliability diagram (see help)
-#realiable.sea <- reliabilityCategories(hindcast = fcst_cal,
-#                                       obs = obs,
-#                                       n.events = 3,
-#                                       labels = c("Below", "Average", "Above"),
-#                                       n.bins = 10,
-#                                       cex0 = 0.5,
-#                                       cex.scale = 20)
+realiable.sea <- reliabilityCategories(hindcast = fcst_cal,
+                                       obs = obs,
+                                       n.events = 3,
+                                       labels = c("Below", "Average", "Above"),
+                                       n.boot = 100,
+                                       n.bins = 10,
+                                       cex0 = 0.5,
+                                       cex.scale = 20)
