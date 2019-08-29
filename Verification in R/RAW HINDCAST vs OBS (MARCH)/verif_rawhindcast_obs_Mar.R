@@ -237,3 +237,19 @@ spatialPlot(lower.tercile,
 #            main = "Area under the ROC curve",
 #            sub = "ECMWF 24 member - MARCH Mean 2mT (1993-2016)")
 #------------------------------------------
+#COMPUTE CONTINUOUS RANKED PROBABILITY SCORE (CRPS)
+#via library(verification)
+#need to change fcst to a vector or matrix of the mean and sd
+#of a normal distribution
+m <- mean(fcst$Data)
+sdev <- sd(fcst$Data)
+
+#put mean and sd into a dataframe to be inserted into crps().
+pred <- data.frame(m,sdev)
+#calculate score
+crps(obs$Data, pred)
+#output based on using fcst_cal_CCR as obs is calculated
+#crps is generated in output
+#CRPS = mean of crps = 0.7655865 is shown
+#ign = ignorance score is generated in output as well
+#IGN = mean of ignorance score = 1.850416
