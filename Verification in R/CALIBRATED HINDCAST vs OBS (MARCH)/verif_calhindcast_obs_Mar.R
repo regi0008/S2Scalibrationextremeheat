@@ -185,7 +185,7 @@ grepAndMatch <- function(x, table) {
 #obs_formatted: time, lat, lon
 dir1 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat"
 #predictor (raw hincast):
-fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_CCR.nc"), "tas")
+fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_MVA.nc"), "tas")
 
 dir2 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
 #predictand:
@@ -265,12 +265,15 @@ sdev <- sd(fcst_cal$Data)
 #put mean and sd into a dataframe to be inserted into crps().
 pred <- data.frame(m,sdev)
 #calculate score
-crps(obs$Data, pred)
-#output based on using fcst_cal_CCR as obs is calculated
+calculate_crps_fcst_cal_MVA <- crps(obs$Data, pred)
+print(calculate_crps_fcst_cal_MVA)
+#output based on using fcst_cal_MVA as obs is calculated
 #crps is generated in output
-#CRPS = mean of crps = 0.7558377 is shown
+#CRPS = mean of crps = 0.7559118 is shown
 #ign = ignorance score is generated in output as well
-#IGN = mean of ignorance score = 1.841349
+#IGN = mean of ignorance score = 1.841354
+#write data to a file in work directory. Remember to check for your working directory first.
+write.table(calculate_crps_fcst_cal_MVA, file = "calculate_crps_fcst_cal_MVA.csv", quote = FALSE, sep = ",")
 #------------------------------------------
 #not complete yet
 #COMPUTE RELIABILITY DIAGRAM
@@ -280,7 +283,7 @@ crps(obs$Data, pred)
 #labels are respectively for the no. of events
 #cex0 = min. no of points shown in reliability diagram
 #cex.scale = scaling factor for points sizes in reliability diagram (see help)
-realiable.sea <- reliabilityCategories(hindcast = fcst_cal,
+reliable.sea <- reliabilityCategories(hindcast = fcst_cal,
                                        obs = obs,
                                        n.events = 3,
                                        labels = c("Below", "Average", "Above"),
