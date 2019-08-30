@@ -111,10 +111,10 @@ writeNcdf <- function(gridData, filePath, missingValue = 1e20, tz = 'GMT', units
   
   # Depending on whether there is a member part of the dataset.
   # default list
-  dimList <- list(dimLon, dimLat, dimTime, dimMem)
+  dimList <- list(dimMem, dimTime, dimLat, dimLon)
   
   # In order to keep the dim list exactly the same with the original one, it needs to be changed.
-  dimIndex <- grepAndMatch(c('lon','lat','time','member'), attributes(gridData$Data)$dimensions)
+  dimIndex <- grepAndMatch(c('member', 'time', 'lat', 'lon'), attributes(gridData$Data)$dimensions)
   dimIndex <- na.omit(dimIndex)
   
   # delete the NULL list, in order that there is no member part in the data.
@@ -214,6 +214,7 @@ roc <- veriApply(verifun = "EnsRoca",
 upper.tercile <- easyVeri2grid(easyVeri.mat = t(roc$cat3),
                                obs.grid = obs,
                                verifun = "EnsRoca")
+str(upper.tercile)
 
 #to plot ROCA diagram (for upper tercile)
 spatialPlot(upper.tercile,
@@ -221,18 +222,9 @@ spatialPlot(upper.tercile,
             main = "ROC AREA (Above-normal) for March",
             color.theme = "YlOrRd")
 
-#to convert gridded data to .nc file, need to call library(loadeR.2nc) and library(ncdf4)
-#filename will be saved into directory
-#change according to your preferred calibration method
-filename <- "calCCR_March_ROCA_AN.nc"
-grid2nc(upper.tercile,
-        NetCDFOutFile = filename,
-        missval = 1e20,
-        prec = "float",
-        globalAttributes = NULL,
-        varAttributes = NULL,
-        shuffle = FALSE,
-        verbose = FALSE)
+fcst_cal_fileName <- "calCCR_March_ROCA_AN.nc"
+writeNcdf(upper.tercile, fcst_cal_fileName)
+
 
 middle.tercile <- easyVeri2grid(easyVeri.mat = t(roc$cat2),
                                 obs.grid = obs,
