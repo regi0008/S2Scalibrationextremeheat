@@ -251,8 +251,10 @@ spatialPlot(mg_ROC_Mar,
 #not complete yet
 #COMPUTE BRIER SCORE (BS)
 #via library(verification)
+#need to convert observations to binary format
 
-#brier(obs, fcst_cal, baseline = NULL, bins = TRUE)
+
+#brier(obs$Data, fcst_cal$Data, baseline = NULL, bins = TRUE)
 
 #------------------------------------------
 #COMPUTE CONTINUOUS RANKED PROBABILITY SCORE (CRPS)
@@ -279,7 +281,10 @@ write.table(calculate_crps_fcst_cal_MVA, file = "calculate_crps_fcst_cal_MVA.csv
 #error message:
 #Error in mat2Dto3Darray(as.matrix(ob.clim[i, , drop = F]), x = obs$xyCoords$x,  : 
 #                          Coordinates 'x' and 'y' must be given in ascending order
-#need to reverse the order of y = obs$xyCoords$y from -ve to +ve ??
+#need to reverse the order of y = obs$xyCoords$y from -ve to +ve ? tried below:
+#rev(obs$xyCoords$y)
+#rev(fcst_cal$xyCoords$y)
+
 #COMPUTE RELIABILITY DIAGRAM
 #RELIABILITY CATEGORIES - use reliabilityCategories()
 #it computes reliability categories for probabilistic forecasts
@@ -287,11 +292,11 @@ write.table(calculate_crps_fcst_cal_MVA, file = "calculate_crps_fcst_cal_MVA.csv
 #labels are respectively for the no. of events
 #cex0 = min. no of points shown in reliability diagram
 #cex.scale = scaling factor for points sizes in reliability diagram (see help)
-reliable.sea <- reliabilityCategories(hindcast = fcst_cal,
-                                       obs = obs,
-                                       n.events = 3,
-                                       labels = c("Below", "Average", "Above"),
-                                       n.boot = 100,
-                                       n.bins = 10,
-                                       cex0 = 0.5,
-                                       cex.scale = 20)
+reliable.sea <- reliabilityCategories(fcst_cal,
+                                      obs,
+                                      n.events = 3,
+                                      labels = c("Below", "Average", "Above"),
+                                      n.boot = 100,
+                                      n.bins = 10,
+                                      cex0 = 0.5,
+                                      cex.scale = 20)
