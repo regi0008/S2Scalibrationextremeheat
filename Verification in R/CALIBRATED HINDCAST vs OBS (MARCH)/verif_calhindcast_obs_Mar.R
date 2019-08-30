@@ -188,7 +188,7 @@ dir1 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat"
 fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_CCR.nc"), "tas")
 
 dir2 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
-#predictand:
+#predictand (observation):
 obs <- loadNcdf(file.path(dir2, "2t_era5_Mar_1993_2016_format.nc"), "tas")
 #------------------------------------------
 #VERIFICATION BETWEEN CALIBRATED HINDCAST AND OBSERVATIONS
