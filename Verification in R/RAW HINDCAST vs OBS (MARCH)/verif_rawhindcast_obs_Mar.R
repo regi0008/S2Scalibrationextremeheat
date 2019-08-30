@@ -247,9 +247,13 @@ sdev <- sd(fcst$Data)
 #put mean and sd into a dataframe to be inserted into crps().
 pred <- data.frame(m,sdev)
 #calculate score
-crps(obs$Data, pred)
-#output based on using fcst_cal_CCR as obs is calculated
+calculate_crps_rawfcst <- crps(obs$Data, pred)
+print(calculate_crps_rawfcst)
+#output is based on using raw hindcast as obs is calculated
 #crps is generated in output
 #CRPS = mean of crps = 0.7655865 is shown
 #ign = ignorance score is generated in output as well
 #IGN = mean of ignorance score = 1.850416
+#write data to a file in work directory. Remember to check for your working directory first.
+write.table(calculate_crps_rawfcst, file = "calculate_crps_rawfcst.csv", quote = FALSE, sep = ",")
+#------------------------------------------
