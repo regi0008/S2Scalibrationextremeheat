@@ -3,6 +3,7 @@ library(downscaleR)
 library(transformeR)
 library(visualizeR)
 library(calibratoR)
+library(loadeR.2nc)
 library(ncdf4)
 library(abind)
 library(s2dverification)
@@ -185,7 +186,7 @@ grepAndMatch <- function(x, table) {
 #obs_formatted: time, lat, lon
 dir1 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat"
 #predictor (calibrated hincast):
-fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_MVA.nc"), "tas")
+fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_CCR.nc"), "tas")
 
 dir2 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
 #predictand (observation):
@@ -209,19 +210,35 @@ roc <- veriApply(verifun = "EnsRoca",
 #Dimension problem. To tackle above message, transpose roc$(whatever category)
 #plot ROC AREA for each tercile category
 #obs.grid = the grid containing the verifying reference used
+#easyVeri2grid returns a climatological grid.
 upper.tercile <- easyVeri2grid(easyVeri.mat = t(roc$cat3),
                                obs.grid = obs,
                                verifun = "EnsRoca")
 
+#to plot ROCA diagram (for upper tercile)
 spatialPlot(upper.tercile,
             backdrop.theme= "countries",
             main = "ROC AREA (Above-normal) for March",
             color.theme = "YlOrRd")
 
+#to convert gridded data to .nc file, need to call library(loadeR.2nc) and library(ncdf4)
+#filename will be saved into directory
+#change according to your preferred calibration method
+filename <- "calCCR_March_ROCA_AN.nc"
+grid2nc(upper.tercile,
+        NetCDFOutFile = filename,
+        missval = 1e20,
+        prec = "float",
+        globalAttributes = NULL,
+        varAttributes = NULL,
+        shuffle = FALSE,
+        verbose = FALSE)
+
 middle.tercile <- easyVeri2grid(easyVeri.mat = t(roc$cat2),
                                 obs.grid = obs,
                                 verifun = "EnsRoca")
 
+#to plot ROCA diagram
 spatialPlot(middle.tercile,
             backdrop.theme= "countries",
             main = "ROC AREA (Near-normal) for March",
@@ -231,6 +248,7 @@ lower.tercile <- easyVeri2grid(easyVeri.mat = t(roc$cat1),
                                obs.grid = obs,
                                verifun = "EnsRoca")
 
+#to plot ROCA diagram
 spatialPlot(lower.tercile,
             backdrop.theme= "countries",
             main = "ROC AREA (Below-normal) for March",
@@ -252,9 +270,10 @@ spatialPlot(mg_ROC_Mar,
 #COMPUTE BRIER SCORE (BS)
 #via library(verification)
 #need to convert observations to binary format
+#format: brier(vector of binary obs, vector of probabilistic predic/hindcast,
+#               thresholds etc.)
 
-
-#brier(obs$Data, fcst_cal$Data, baseline = NULL, bins = TRUE)
+brier(obs$Data, fcst_cal$Data, baseline = NULL, bins = TRUE)
 
 #------------------------------------------
 #COMPUTE CONTINUOUS RANKED PROBABILITY SCORE (CRPS)
