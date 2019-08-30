@@ -185,7 +185,7 @@ grepAndMatch <- function(x, table) {
 #obs_formatted: time, lat, lon
 dir1 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat"
 #predictor (calibrated hincast):
-fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_CCR.nc"), "tas")
+fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_MVA.nc"), "tas")
 
 dir2 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
 #predictand (observation):
