@@ -5,8 +5,10 @@ library(visualizeR)
 library(calibratoR)
 library(ncdf4)
 library(abind)
+library(s2dverification)
 library(SpecsVerification)
 library(easyVerification)
+library(verification)
 library(RColorBrewer)
 
 loadNcdf <- function(filePath, varname, tz = 'GMT', ...) {
@@ -82,41 +84,23 @@ loadNcdf <- function(filePath, varname, tz = 'GMT', ...) {
   
 }
 
-writeNcdf <- function(gridData, filePath, missingValue = 1e20, tz = 'GMT', units = NULL, version = 3) {
+writeNcdf_verf <- function(gridData, filePath, missingValue = 1e20, tz = 'GMT', units = NULL, version = 3) {
   
   name <- gridData$Variable$varName
   # First defines dimensions.
   dimLon <- ncdim_def('lon', 'degrees_east', gridData$xyCoords$x)
   dimLat <- ncdim_def('lat', 'degrees_north', gridData$xyCoords$y)
   dimMem <- NULL
-  if (!is.null(gridData$Members)) {
-    dimMem <- ncdim_def('member', 'members', 0:(length(gridData$Members)-1))
-  }
+  dimTime <- NULL
   
-  # Time needs to be treated seperately
-  dates <- as.POSIXlt(gridData$Dates$start, tz = tz)
-  if (is.null(units)) {
-    units <- getTimeUnit(dates)
-    time <- difftime(dates, dates[1], units = units)
-  } else {
-    time <- difftime(dates, dates[1], units = units)
-  }
-  timeUnits <- paste(units, 'since', dates[1])
-  # Here time needs to be numeric, as required by ncdf4 package, which is not the same
-  # with ncdf
-  dimTime <- ncdim_def('time', timeUnits, as.numeric(time))
-  
-  # Depending on whether there is a member part of the dataset.
+  #---------------------------------------  
   # default list
-  dimList <- list(dimLon, dimLat, dimTime, dimMem)
+  dimList <- list(dimLat, dimLon)
   
   # In order to keep the dim list exactly the same with the original one, it needs to be changed.
-  dimIndex <- grepAndMatch(c('lon','lat','time','member'), attributes(gridData$Data)$dimensions)
-  dimIndex <- na.omit(dimIndex)
-  
-  # delete the NULL list, in order that there is no member part in the data.
-  dimList <- Filter(Negate(is.null), dimList)
-  # Then difines data
+  dimIndex <- grepAndMatch(c('lat', 'lon', 'time'), attributes(gridData$Data)$dimensions)
+  #---------------------------------------  
+  # Then defines data
   var <- ncvar_def(name, "units", dimList, missingValue)
   
   # Here for ncdf4, there is an option to create version 4 ncdf, in future, it
@@ -129,18 +113,10 @@ writeNcdf <- function(gridData, filePath, missingValue = 1e20, tz = 'GMT', units
     stop("Which ncdf version you want? Only 3 and 4 can be selected!")
   }
   
-  if (!is.null(dimMem)){
-    ncatt_put(nc, "member", "standard_name","realization")
-    ncatt_put(nc, "member", "_CoordinateAxisType","Ensemble")
-    ncatt_put(nc, "time", "standard_name","time")
-    ncatt_put(nc, "time", "axis","T")
-    ncatt_put(nc, "time", "_CoordinateAxisType","Time")
-    #ncatt_put(nc, "time", "_ChunkSize",1)
-    ncatt_put(nc, 'lat', "standard_name","latitude")
-    ncatt_put(nc, 'lat', "_CoordinateAxisType","Lat")
-    ncatt_put(nc, 'lon', "standard_name","longitude")
-    ncatt_put(nc, 'lon', "_CoordinateAxisType","Lon")
-  }
+  ncatt_put(nc, 'lat', "standard_name","latitude")
+  ncatt_put(nc, 'lat', "_CoordinateAxisType","Lat")
+  ncatt_put(nc, 'lon', "standard_name","longitude")
+  ncatt_put(nc, 'lon', "_CoordinateAxisType","Lon")
   
   # This part has to be put
   ncatt_put(nc, 0, "Conventions","CF-1.4")
@@ -150,21 +126,6 @@ writeNcdf <- function(gridData, filePath, missingValue = 1e20, tz = 'GMT', units
   ncvar_put(nc, name, data)
   nc_close(nc)
   
-}
-
-# For internaluse by writeNcdf
-getTimeUnit <- function(dates) {
-  units <- c('weeks', 'days', 'hours', 'mins', 'secs')
-  output <- NULL
-  for (unit in units) {
-    time <- difftime(dates, dates[1], units = unit)
-    rem <- sapply(time, function(x) x%%1)
-    if (!any(rem != 0)) {
-      output <- unit
-      break
-    }
-  } 
-  return(output)
 }
 
 # in order to first grep than match.
@@ -184,76 +145,51 @@ fcst <- loadNcdf(file.path(dir, "2t_201902_Mar_rev.nc"), "tas")
 #predictand:
 obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_rev.nc"), "tas")
 #------------------------------------------
-#VERIFICATION BETWEEN RAW HINDCAST AND OBSERVATIONS
+#VERIFICATION BETWEEN CALIBRATED HINDCAST AND OBSERVATIONS
 
 #compute area under the ROC Curve via easyVerification package.
 #EnsRoca computes the area under the ROC curve given the observations.
-#tercile probabilities: let prob = 1:2/3
+#tercile probabilities: let prob = 1:2/3.. or c(1/3,2/3)
+#tdim = index of dimension with the different forecasts
+#ensdim = index of dimension with the different ensemble members
 roc <- veriApply(verifun = "EnsRoca",
                  fcst = fcst$Data,
                  obs = obs$Data,
-                 prob = c(1/3,2/3),
-                 ensdim = 1,
-                 tdim = 2)
+                 prob = c(1/3,2/3))
 
+#ERROR MESSAGE FROM THIS LINE BELOW:
+#"Error in easyVeri2grid(easyVeri.mat = roc$cat3, obs.grid = obs, verifun = "EnsRoca") : 
+#XY coordinates and matrix dimensions do not match"
+#Dimension problem. To tackle above message, transpose roc$(whatever category)
 #plot ROC AREA for each tercile category
 #obs.grid = the grid containing the verifying reference used
-upper.tercile <- easyVeri2grid(easyVeri.mat = roc$cat3,
+#easyVeri2grid returns a climatological grid.
+upper.tercile <- easyVeri2grid(easyVeri.mat = t(roc$cat3),
                                obs.grid = obs,
                                verifun = "EnsRoca")
+str(upper.tercile)
 
-spatialPlot(upper.tercile,
-            backdrop.theme= "countries",
-            main = "ROC AREA (Above-normal) for March",
-            color.theme = "YlOrRd")
+#to plot ROCA diagram (for upper tercile)
+#spatialPlot(upper.tercile,
+#            backdrop.theme= "countries",
+#            main = "ROC AREA (Above-normal) for March",
+#            color.theme = "YlOrRd")
 
-middle.tercile <- easyVeri2grid(easyVeri.mat = roc$cat2,
+fcst_fileName <- "calLR_March_ROCA_AN.nc"
+writeNcdf_verf(upper.tercile, fcst_fileName)
+
+#middle.tercile <- easyVeri2grid(easyVeri.mat = t(roc$cat2),
+#                               obs.grid = obs,
+#                               verifun = "EnsRoca")
+#str(middle.tercile)
+
+#fcst_fileName <- "calCCR_March_ROCA_NN.nc"
+#writeNcdf_verf(middle.tercile, fcst_fileName)
+
+lower.tercile <- easyVeri2grid(easyVeri.mat = t(roc$cat1),
                                obs.grid = obs,
                                verifun = "EnsRoca")
+str(lower.tercile)
 
-spatialPlot(middle.tercile,
-            backdrop.theme= "countries",
-            main = "ROC AREA (Near-normal) for March",
-            color.theme = "YlOrRd")
-
-lower.tercile <- easyVeri2grid(easyVeri.mat = roc$cat1,
-                               obs.grid = obs,
-                               verifun = "EnsRoca")
-
-spatialPlot(lower.tercile,
-            backdrop.theme= "countries",
-            main = "ROC AREA (Below-normal) for March",
-            color.theme = "YlOrRd")
-
-#ERROR BELOW WHEN TRYING TO MAKE MULTIGRID OF CAT1 TO CAT3
-#multigrid <- lapply(roc[1:3], "easyVeri2grid", obs)
-#mg_ROC_Mar <- makeMultiGrid(multigrid)
-#str(mg_ROC_Mar)
-#spatialPlot(mg_ROC_Mar,
-#            backdrop.theme = "countries",
-#            color.theme = "YlOrRd",
-#            names.attr = c("Lower tercile", "Middle tercile", "Upper tercile"),
-#            layout = c(3,1),
-#            main = "Area under the ROC curve",
-#            sub = "ECMWF 24 member - MARCH Mean 2mT (1993-2016)")
-#------------------------------------------
-#COMPUTE CONTINUOUS RANKED PROBABILITY SCORE (CRPS)
-#via library(verification)
-#need to change fcst to a vector or matrix of the mean and sd
-#of a normal distribution
-m <- mean(fcst$Data)
-sdev <- sd(fcst$Data)
-
-#put mean and sd into a dataframe to be inserted into crps().
-pred <- data.frame(m,sdev)
-#calculate score
-calculate_crps_rawfcst <- crps(obs$Data, pred)
-print(calculate_crps_rawfcst)
-#output is based on using raw hindcast as obs is calculated
-#crps is generated in output
-#CRPS = mean of crps = 0.7655865 is shown
-#ign = ignorance score is generated in output as well
-#IGN = mean of ignorance score = 1.850416
-#write data to a file in work directory. Remember to check for your working directory first.
-write.table(calculate_crps_rawfcst, file = "calculate_crps_rawfcst.csv", quote = FALSE, sep = ",")
-#------------------------------------------
+fcst_fileName <- "calLR_March_ROCA_BN.nc"
+writeNcdf_verf(lower.tercile, fcst_fileName)
