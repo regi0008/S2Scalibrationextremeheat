@@ -3,7 +3,6 @@ library(downscaleR)
 library(transformeR)
 library(visualizeR)
 library(calibratoR)
-library(loadeR.2nc)
 library(ncdf4)
 library(abind)
 library(s2dverification)
@@ -108,7 +107,7 @@ writeNcdf <- function(gridData, filePath, missingValue = 1e20, tz = 'GMT', units
   # Here time needs to be numeric, as required by ncdf4 package, which is not the same
   # with ncdf
   dimTime <- ncdim_def('time', timeUnits, as.numeric(time))
-  
+#---------------------------------------  
   # Depending on whether there is a member part of the dataset.
   # default list
   dimList <- list(dimMem, dimTime, dimLat, dimLon)
@@ -116,7 +115,7 @@ writeNcdf <- function(gridData, filePath, missingValue = 1e20, tz = 'GMT', units
   # In order to keep the dim list exactly the same with the original one, it needs to be changed.
   dimIndex <- grepAndMatch(c('member', 'time', 'lat', 'lon'), attributes(gridData$Data)$dimensions)
   dimIndex <- na.omit(dimIndex)
-  
+#---------------------------------------  
   # delete the NULL list, in order that there is no member part in the data.
   dimList <- Filter(Negate(is.null), dimList)
   # Then difines data
@@ -246,17 +245,6 @@ spatialPlot(lower.tercile,
             main = "ROC AREA (Below-normal) for March",
             color.theme = "YlOrRd")
 
-#ERROR BELOW WHEN TRYING TO MAKE MULTIGRID OF CAT1 TO CAT3
-multigrid <- lapply(roc[1:3], "easyVeri2grid", obs)
-mg_ROC_Mar <- makeMultiGrid(multigrid)
-str(mg_ROC_Mar)
-spatialPlot(mg_ROC_Mar,
-            backdrop.theme = "countries",
-            color.theme = "YlOrRd",
-            names.attr = c("Lower tercile", "Middle tercile", "Upper tercile"),
-            layout = c(3,1),
-            main = "Area under the ROC curve",
-            sub = "ECMWF 24 member - MARCH Calibrated Mean 2mT (1993-2016)")
 #------------------------------------------
 #not complete yet
 #COMPUTE BRIER SCORE (BS)
@@ -278,15 +266,31 @@ sdev <- sd(fcst_cal$Data)
 #put mean and sd into a dataframe to be inserted into crps().
 pred <- data.frame(m,sdev)
 #calculate score
-calculate_crps_fcst_cal_MVA <- crps(obs$Data, pred)
-print(calculate_crps_fcst_cal_MVA)
-#output based on using fcst_cal_MVA as obs is calculated
+calculate_crps_fcst_cal_CCR <- crps(obs$Data, pred)
+print(calculate_crps_fcst_cal_CCR)
+#output based on using fcst_cal_CCR as obs is calculated
 #crps is generated in output
-#CRPS = mean of crps = 0.7559118 is shown
+#CRPS = mean of crps = 0.7558377 is shown
 #ign = ignorance score is generated in output as well
-#IGN = mean of ignorance score = 1.841354
+#IGN = mean of ignorance score = 1.841349
 #write data to a file in work directory. Remember to check for your working directory first.
-write.table(calculate_crps_fcst_cal_MVA, file = "calculate_crps_fcst_cal_MVA.csv", quote = FALSE, sep = ",")
+write.table(calculate_crps_fcst_cal_CCR, file = "calculate_crps_fcst_cal_CCR.csv", quote = FALSE, sep = ",")
+#------------------------------------------
+#try another
+#COMPUTE DECOMPOSITION of CONTINUOUS RANKED PROBABILITY SCORE (CRPS)
+#The CRPS measures the distance between the predicted and the observed
+#cumulative density functions (CDFs) of scalar variables.
+#Furthermore, the crpsDecomposition function provides the reliability and
+#resolution terms obtained by the CRPS decomposition proposed by Hersbach.
+#The alpha, beta matrices and Heavisides vectors of outliers calculated in the
+#CRPS decomposition are also returned.
+#To speed up calculation time, these matrices/vectors can then be used to
+#recalculate the CRPS's in a bootstrap by using the crpsFromAlphaBeta function.
+
+crpsDecomposition(obs$Data, as.matrix(fcst_cal$Data))
+
+#error:
+#Error in prev[index, 1] : subscript out of bounds
 #------------------------------------------
 #not complete yet
 #error message:
@@ -311,3 +315,20 @@ reliable.sea <- reliabilityCategories(fcst_cal,
                                       n.bins = 10,
                                       cex0 = 0.5,
                                       cex.scale = 20)
+
+#------------------------------------------
+#compute the ensemble mean correlation (Pearson) with the verifying observations
+
+cor <- veriApply(verifun = "EnsCorr",
+                 fcst_cal$Data,
+                 obs$Data,
+                 ensdim = 1,
+                 tdim = 2)
+
+cor.grid <- easyVeri2grid(easyVeri.mat = cor,
+                          obs.grid = obs,
+                          verifun = "EnsCorr")
+
+spatialPlot(climatology(cor.grid),
+            backdrop.theme = "countries",
+            main = "Ensemble Correlation")
