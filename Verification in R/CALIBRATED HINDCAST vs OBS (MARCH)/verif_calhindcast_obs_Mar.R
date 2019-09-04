@@ -267,6 +267,10 @@ sdev <- sd(fcst_cal$Data)
 pred <- data.frame(m,sdev)
 #calculate score
 calculate_crps_fcst_cal_CCR <- crps(obs$Data, pred)
+
+crps_fcst_cal_CCR_fileName <- "crps_fcst_cal_CCR.nc"
+writeNcdf(calculate_crps_fcst_cal_CCR, crps_fcst_cal_CCR_fileName)
+
 print(calculate_crps_fcst_cal_CCR)
 #output based on using fcst_cal_CCR as obs is calculated
 #crps is generated in output
