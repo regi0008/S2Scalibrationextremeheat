@@ -321,10 +321,10 @@ reliable.sea <- reliabilityCategories(fcst_cal,
 
 cor <- veriApply(verifun = "EnsCorr",
                  fcst_cal$Data,
-                 obs$Data,
-                 ensdim = 1,
-                 tdim = 2)
+                 obs$Data)
 
+#cor is a 51x31 matrix
+#erorr: XY coordinates and matrix dimensions do not match
 cor.grid <- easyVeri2grid(easyVeri.mat = cor,
                           obs.grid = obs,
                           verifun = "EnsCorr")
