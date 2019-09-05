@@ -195,6 +195,24 @@ obs <- loadNcdf(file.path(dir2, "2t_era5_Mar_1993_2016_format.nc"), "tas")
 #Using library(easyVerification) and library(SpecsVerification)
 #we can use veriApply function to get Crps
 
+EnsCrps = function(ens, obs, R.new=NA) {
+  
+  stopifnot(is.matrix(ens), 
+            nrow(ens) == length(obs), 
+            length(R.new)==1)
+  
+  crps = enscrps_cpp(ens, obs, R.new)
+  
+  # return the vector of crps
+  return(crps)
+  
+}
+
+FairCrps = function(ens, obs) {
+  return(EnsCrps(ens, obs, R.new=Inf))
+}
+
+
 #crps_results_ens <- veriApply(verifun = "EnsCrps",
 #                 fcst = fcst_cal$Data,
 #                 obs = obs$Data,
