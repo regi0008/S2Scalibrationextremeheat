@@ -137,13 +137,14 @@ grepAndMatch <- function(x, table) {
   }))
   return(index)
 }
+
 #------------------------------------------
 #LOADING OF FILES THROUGH HYFO PACKAGE:
 dir <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
 #predictor (raw hincast):
-fcst <- loadNcdf(file.path(dir, "2t_201902_Mar_rev.nc"), "tas")
+fcst <- loadNcdf(file.path(dir, "2t_201902_Mar_format.nc"), "tas")
 #predictand:
-obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_rev.nc"), "tas")
+obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_format.nc"), "tas")
 #------------------------------------------
 #VERIFICATION BETWEEN CALIBRATED HINDCAST AND OBSERVATIONS
 
@@ -155,7 +156,7 @@ obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_rev.nc"), "tas")
 roc <- veriApply(verifun = "EnsRoca",
                  fcst = fcst$Data,
                  obs = obs$Data,
-                 prob = c(1/3,2/3))
+                 prob = 1:2/3)
 
 #ERROR MESSAGE FROM THIS LINE BELOW:
 #"Error in easyVeri2grid(easyVeri.mat = roc$cat3, obs.grid = obs, verifun = "EnsRoca") : 
@@ -175,7 +176,7 @@ str(upper.tercile)
 #            main = "ROC AREA (Above-normal) for March",
 #            color.theme = "YlOrRd")
 
-fcst_fileName <- "calLR_March_ROCA_AN.nc"
+fcst_fileName <- "raw_March_ROCA_AN.nc"
 writeNcdf_verf(upper.tercile, fcst_fileName)
 
 #middle.tercile <- easyVeri2grid(easyVeri.mat = t(roc$cat2),
@@ -191,5 +192,5 @@ lower.tercile <- easyVeri2grid(easyVeri.mat = t(roc$cat1),
                                verifun = "EnsRoca")
 str(lower.tercile)
 
-fcst_fileName <- "calLR_March_ROCA_BN.nc"
+fcst_fileName <- "raw_March_ROCA_BN.nc"
 writeNcdf_verf(lower.tercile, fcst_fileName)
