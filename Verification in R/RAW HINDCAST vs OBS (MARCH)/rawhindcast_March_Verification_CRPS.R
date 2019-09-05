@@ -149,40 +149,43 @@ obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_format.nc"), "tas")
 #VERIFICATION BETWEEN CALIBRATED HINDCAST AND OBSERVATIONS
 
 #compute crps for raw hindcast vs obs
-
 #Using library(easyVerification) and library(SpecsVerification)
 #we can use veriApply function to get Crps
 
-#https://github.com/cran/SpecsVerification/blob/master/src/enscrps.cpp
-EnsCrps = function(ens, obs, R.new=NA) {
-  
-  stopifnot(is.matrix(ens), 
-            nrow(ens) == length(obs), 
-            length(R.new)==1)
-  
-  crps = enscrps_cpp(ens, obs, R.new)
-  
-  # return the vector of crps
-  return(crps)
-  
-}
+#crps_results_ens <- veriApply(verifun = "EnsCrps",
+#                 fcst = fcst$Data,
+#                 obs = obs$Data,
+#                 prob = NULL)
 
-FairCrps = function(ens, obs) {
-  return(EnsCrps(ens, obs, R.new=Inf))
-}
+#print(crps_results_ens)
 
+#crps_results_fair <- veriApply(verifun = "FairCrps",
+#                               fcst = fcst$Data,
+#                               obs = obs$Data,
+#                               prob = NULL)
 
-crps_results_ens <- veriApply(verifun = "EnsCrps",
-                 fcst = fcst$Data,
-                 obs = obs$Data,
-                 prob = NULL)
-
-print(crps_results_ens)
-
-crps_results_fair <- veriApply(verifun = "FairCrps",
-                               fcst = fcst$Data,
-                               obs = obs$Data,
-                               prob = NULL)
-
-print(crps_results_fair)
+#print(crps_results_fair)
 #------------------------------------------
+#COMPUTE CONTINUOUS RANKED PROBABILITY SCORE (CRPS)
+
+calculate_crps_fcst_raw <- veriApply(verifun = "EnsCrps", fcst = fcst$Data, obs = obs$Data)
+
+#Output array calculate_crps_fcst_raw to netcdf file
+metadata <- list(calculate_crps_fcst_raw = list(units = 'unit'))
+attr(calculate_crps_fcst_raw, 'variables') <- metadata
+names(dim(calculate_crps_fcst_raw)) <- c('lon', 'lat', 'time')
+
+lon <- seq(90, 140)
+dim(lon) <- length(lon)
+metadata <- list(lon = list(units = 'degrees_east'))
+attr(lon, 'variables') <- metadata
+names(dim(lon)) <- 'lon'
+
+lat <- seq(-10, 20)
+dim(lat) <- length(lat)
+metadata <- list(lat = list(units = 'degrees_north'))
+attr(lat, 'variables') <- metadata
+names(dim(lat)) <- 'lat'
+
+crps_fcst_raw_fileName <- "crps_fcst_raw.nc"
+ArrayToNetCDF(list(lon, lat, calculate_crps_fcst_raw), crps_fcst_raw_fileName)
