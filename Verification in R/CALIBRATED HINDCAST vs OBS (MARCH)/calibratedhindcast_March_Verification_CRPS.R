@@ -191,27 +191,21 @@ dir2 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
 #predictand (observation):
 obs <- loadNcdf(file.path(dir2, "2t_era5_Mar_1993_2016_format.nc"), "tas")
 #------------------------------------------
-#COMPUTE CONTINUOUS RANKED PROBABILITY SCORE (CRPS)
-#via library(verification)
-#need to change fcst to a vector or matrix of the mean and sd
-#of a normal distribution
-m <- mean(fcst_cal$Data)
-sdev <- sd(fcst_cal$Data)
+#VERIFICATION BETWEEN CALIBRATED HINDCAST AND OBSERVATIONS
+#Using library(easyVerification) and library(SpecsVerification)
+#we can use veriApply function to get Crps
 
-#put mean and sd into a dataframe to be inserted into crps().
-pred <- data.frame(m,sdev)
-#calculate score
-calculate_crps_fcst_cal_CCR <- crps(obs$Data, pred)
+#crps_results_ens <- veriApply(verifun = "EnsCrps",
+#                 fcst = fcst_cal$Data,
+#                 obs = obs$Data,
+#                 prob = NULL)
 
-crps_fcst_cal_CCR_fileName <- "crps_fcst_cal_CCR.nc"
-writeNcdf(calculate_crps_fcst_cal_CCR, crps_fcst_cal_CCR_fileName)
+#print(crps_results_ens)
 
-print(calculate_crps_fcst_cal_CCR)
-#output based on using fcst_cal_CCR as obs is calculated
-#crps is generated in output
-#CRPS = mean of crps = 0.7558377 is shown
-#ign = ignorance score is generated in output as well
-#IGN = mean of ignorance score = 1.841349
-#write data to a file in work directory. Remember to check for your working directory first.
-write.table(calculate_crps_fcst_cal_CCR, file = "calculate_crps_fcst_cal_CCR.csv", quote = FALSE, sep = ",")
+crps_results_fair <- veriApply(verifun = "FairCrps",
+                              fcst = fcst_cal$Data,
+                              obs = obs$Data,
+                              prob = NULL)
+
+print(crps_results_fair)
 #------------------------------------------
