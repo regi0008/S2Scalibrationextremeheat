@@ -214,12 +214,12 @@ FairCrps = function(ens, obs) {
 }
 
 
-#crps_results_ens <- veriApply(verifun = "EnsCrps",
-#                 fcst = fcst_cal$Data,
-#                 obs = obs$Data,
-#                 prob = NULL)
+crps_results_ens <- veriApply(verifun = "EnsCrps",
+                 fcst = fcst_cal$Data,
+                 obs = obs$Data,
+                 prob = NULL)
 
-#print(crps_results_ens)
+print(crps_results_ens)
 
 crps_results_fair <- veriApply(verifun = "FairCrps",
                               fcst = fcst_cal$Data,
