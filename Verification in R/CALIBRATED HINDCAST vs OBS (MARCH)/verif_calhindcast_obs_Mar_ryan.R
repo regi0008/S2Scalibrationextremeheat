@@ -142,13 +142,13 @@ grepAndMatch <- function(x, table) {
 #need to make sure dimensions of both files are the same:
 #calibrated hindcast: member, time, lat, lon
 #obs_formatted: time, lat, lon
-#dir1 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat"
-dir1 <- "C:/Users/Work/Desktop/Regine_project/data"
+dir1 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat"
+#dir1 <- "C:/Users/Work/Desktop/Regine_project/data"
 #predictor (calibrated hincast):
-fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_CCR.nc"), "tas")
+fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_LR.nc"), "tas")
 
-#dir2 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
-dir2 <- "C:/Users/Work/Desktop/Regine_project/data"
+dir2 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
+#dir2 <- "C:/Users/Work/Desktop/Regine_project/data"
 #predictand (observation):
 obs <- loadNcdf(file.path(dir2, "2t_era5_Mar_1993_2016_format.nc"), "tas")
 #------------------------------------------
@@ -177,10 +177,26 @@ upper.tercile <- easyVeri2grid(easyVeri.mat = t(roc$cat3),
 str(upper.tercile)
 
 #to plot ROCA diagram (for upper tercile)
-spatialPlot(upper.tercile,
-            backdrop.theme= "countries",
-            main = "ROC AREA (Above-normal) for March",
-            color.theme = "YlOrRd")
+#spatialPlot(upper.tercile,
+#            backdrop.theme= "countries",
+#            main = "ROC AREA (Above-normal) for March",
+#            color.theme = "YlOrRd")
 
-fcst_cal_fileName <- "calCCR_March_ROCA_AN.nc"
+fcst_cal_fileName <- "calLR_March_ROCA_AN.nc"
 writeNcdf_verf(upper.tercile, fcst_cal_fileName)
+
+#middle.tercile <- easyVeri2grid(easyVeri.mat = t(roc$cat2),
+#                               obs.grid = obs,
+#                               verifun = "EnsRoca")
+#str(middle.tercile)
+
+#fcst_cal_fileName <- "calCCR_March_ROCA_NN.nc"
+#writeNcdf_verf(middle.tercile, fcst_cal_fileName)
+
+lower.tercile <- easyVeri2grid(easyVeri.mat = t(roc$cat1),
+                               obs.grid = obs,
+                               verifun = "EnsRoca")
+str(lower.tercile)
+
+fcst_cal_fileName <- "calLR_March_ROCA_BN.nc"
+writeNcdf_verf(lower.tercile, fcst_cal_fileName)
