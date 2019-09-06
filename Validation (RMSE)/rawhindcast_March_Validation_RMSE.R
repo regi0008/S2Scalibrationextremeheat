@@ -149,7 +149,7 @@ obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_format.nc"), "tas")
 #------------------------------------------
 #ROOT MEAN SQUARE ERROR CALCULATION
 #need library(Metrics) to use rmse()
-  #1) square the errors between fcst$Data (without the members) and obs$Data
+  #1) square the errors between fcst$Data (of each member) and obs$Data
   #2) find the mean of the squared errors
   #3) take the squareroot of that resulting mean
 
