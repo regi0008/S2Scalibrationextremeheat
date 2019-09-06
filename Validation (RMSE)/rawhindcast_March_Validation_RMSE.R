@@ -147,7 +147,8 @@ fcst <- loadNcdf(file.path(dir, "2t_201902_Mar_format.nc"), "tas")
 #predictand:
 obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_format.nc"), "tas")
 #------------------------------------------
-#ROOT MEAN SQUARE ERROR CALCULATION
+#VALIDATION: ROOT MEAN SQUARE ERROR CALCULATION
+
 #need library(Metrics) to use rmse()
   #1) square the errors between fcst$Data (of each member) and obs$Data
   #2) find the mean of the squared errors
@@ -157,8 +158,10 @@ obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_format.nc"), "tas")
 #mse(as.vector(obs$Data), as.vector(fcst$Data[,,,1]))
 #mse(as.vector(obs$Data), as.vector(fcst$Data[,,,2]))
 #mse(as.vector(obs$Data), as.vector(fcst$Data[,,,3]))
+#......
 
 #use sapply function method:
 sapply(1:25, function(i) {
   mse(fcst$Data[,,,i], obs$Data)
 })
+
