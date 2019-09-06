@@ -153,29 +153,12 @@ obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_format.nc"), "tas")
   #2) find the mean of the squared errors
   #3) take the squareroot of that resulting mean
 
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,1]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,2]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,3]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,4]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,5]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,6]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,7]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,8]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,9]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,10]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,11]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,12]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,13]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,14]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,15]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,16]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,17]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,18]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,19]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,20]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,21]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,22]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,23]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,24]))
-mse(as.vector(obs$Data), as.vector(fcst$Data[,,,25]))
-#need to sum up all the mean square errors and sqrt them
+#long method (go through all members.....)
+#mse(as.vector(obs$Data), as.vector(fcst$Data[,,,1]))
+#mse(as.vector(obs$Data), as.vector(fcst$Data[,,,2]))
+#mse(as.vector(obs$Data), as.vector(fcst$Data[,,,3]))
+
+#use sapply function method:
+sapply(1:25, function(i) {
+  mse(fcst$Data[,,,i], obs$Data)
+})
