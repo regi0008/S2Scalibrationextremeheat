@@ -101,21 +101,21 @@ grepAndMatch <- function(x, table) {
 dir1 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat"
 #dir1 <- "C:/Users/Work/Desktop/Regine_project/data"
 #predictor (calibrated hincast):
-fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_LR.nc"), "tas")
+fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_MVA_new.nc"), "tas")
 
 dir2 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
 #dir2 <- "C:/Users/Work/Desktop/Regine_project/data"
 #predictand (observation):
-obs <- loadNcdf(file.path(dir2, "2t_era5_Mar_1993_2016_format.nc"), "tas")
+obs <- loadNcdf(file.path(dir2, "2t_era5_Mar_1993_2016_format_asc.nc"), "tas")
 #------------------------------------------
 #COMPUTE CONTINUOUS RANKED PROBABILITY SCORE (CRPS)
 
-calculate_crps_fcst_cal_LR <- veriApply(verifun = "EnsCrps", fcst = fcst_cal$Data, obs = obs$Data)
+calculate_crps_fcst_cal_MVA <- veriApply(verifun = "EnsCrps", fcst = fcst_cal$Data, obs = obs$Data)
 
-#Output array calculate_crps_fcst_cal_LR to netcdf file
-metadata <- list(calculate_crps_fcst_cal_LR = list(units = 'unit'))
-attr(calculate_crps_fcst_cal_LR, 'variables') <- metadata
-names(dim(calculate_crps_fcst_cal_LR)) <- c('lon', 'lat', 'time')
+#Output array calculate_crps_fcst_cal_MVA to netcdf file
+metadata <- list(calculate_crps_fcst_cal_MVA = list(units = 'unit'))
+attr(calculate_crps_fcst_cal_MVA, 'variables') <- metadata
+names(dim(calculate_crps_fcst_cal_MVA)) <- c('lon', 'lat', 'time')
 
 lon <- seq(90, 140)
 dim(lon) <- length(lon)
@@ -129,5 +129,5 @@ metadata <- list(lat = list(units = 'degrees_north'))
 attr(lat, 'variables') <- metadata
 names(dim(lat)) <- 'lat'
 
-crps_fcst_cal_LR_fileName <- "crps_fcst_cal_LR.nc"
-ArrayToNetCDF(list(lon, lat, calculate_crps_fcst_cal_LR), crps_fcst_cal_LR_fileName)
+crps_fcst_cal_MVA_fileName <- "crps_fcst_cal_MVA_new.nc"
+ArrayToNetCDF(list(lon, lat, calculate_crps_fcst_cal_MVA), crps_fcst_cal_MVA_fileName)
