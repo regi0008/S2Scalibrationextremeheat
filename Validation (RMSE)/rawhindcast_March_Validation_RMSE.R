@@ -143,9 +143,9 @@ grepAndMatch <- function(x, table) {
 #LOADING OF FILES THROUGH HYFO PACKAGE:
 dir <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
 #predictor (raw hincast):
-fcst <- loadNcdf(file.path(dir, "2t_201902_Mar_format.nc"), "tas")
+fcst <- loadNcdf(file.path(dir, "2t_201902_Mar_format_asc.nc"), "tas")
 #predictand:
-obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_format.nc"), "tas")
+obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_format_asc.nc"), "tas")
 #------------------------------------------
 #VALIDATION: ROOT MEAN SQUARE ERROR CALCULATION
 
@@ -153,15 +153,28 @@ obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_format.nc"), "tas")
   #1) square the errors between fcst$Data (of each member) and obs$Data
   #2) find the mean of the squared errors
   #3) take the squareroot of that resulting mean
-
 #long method (go through all members.....)
 #mse(as.vector(obs$Data), as.vector(fcst$Data[,,,1]))
 #mse(as.vector(obs$Data), as.vector(fcst$Data[,,,2]))
 #mse(as.vector(obs$Data), as.vector(fcst$Data[,,,3]))
 #......
-
 #use sapply function method:
-sapply(1:25, function(i) {
+indiv_mse <- sapply(1:25, function(i) {
   mse(fcst$Data[,,,i], obs$Data)
 })
+print(indiv_mse)
+#sum up all members
+total_mse <- sum(indiv_mse)
+print(total_mse)
+#based on formula, rmse = sqrt(mse/n), where n is no. of samples.
+#take n = 1.
+rmse_MVA <- sqrt(total_mse/1)
+print(rmse_MVA)
+#------------------------------------------
+#try easyVerification package method: EnsRmse(ens,obs)
 
+#EnsRmse(as.matrix(fcst$Data), as.vector(obs$Data))
+
+sapply(1:25, function(i) {
+  EnsRmse(as.matrix(fcst$Data[,,,i]), as.vector(obs$Data))
+})
