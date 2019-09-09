@@ -171,10 +171,10 @@ upper.tercile <- easyVeri2grid(easyVeri.mat = t(roc$cat3),
 str(upper.tercile)
 
 #to plot ROCA diagram (for upper tercile)
-#spatialPlot(upper.tercile,
-#            backdrop.theme= "countries",
-#            main = "ROC AREA (Above-normal) for March",
-#            color.theme = "YlOrRd")
+spatialPlot(upper.tercile,
+            backdrop.theme= "countries",
+            main = "ROC AREA (Above-normal) for March",
+            color.theme = "YlOrRd")
 
 fcst_fileName <- "raw_March_ROCA_AN_new.nc"
 writeNcdf_verf(upper.tercile, fcst_fileName)
