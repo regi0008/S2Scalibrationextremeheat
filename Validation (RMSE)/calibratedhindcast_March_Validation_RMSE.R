@@ -166,8 +166,19 @@ obs <- loadNcdf(file.path(dir2, "2t_era5_Mar_1993_2016_format.nc"), "tas")
 #mse(as.vector(obs$Data), as.vector(fcst$Data[,,,2]))
 #mse(as.vector(obs$Data), as.vector(fcst$Data[,,,3]))
 #......
+#a <- (sapply mse function)
+#b <- a / n, where n is the no. of samples
+#c <- sqrt(b)
 
 #use sapply function method:
-sapply(1:25, function(i) {
+indiv_mse <- sapply(1:25, function(i) {
   mse(fcst_cal$Data[,,,i], obs$Data)
 })
+print(indiv_mse)
+#sum up all members
+total_mse <- sum(indiv_mse)
+print(total_mse)
+#based on formula, rmse = sqrt(mse/n), where n is no. of samples.
+#take n = 1.
+rmse_MVA <- sqrt(total_mse/1)
+print(rmse_MVA)
