@@ -142,9 +142,9 @@ grepAndMatch <- function(x, table) {
 #LOADING OF FILES THROUGH HYFO PACKAGE:
 dir <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
 #predictor (raw hincast):
-fcst <- loadNcdf(file.path(dir, "2t_201902_Mar_format.nc"), "tas")
+fcst <- loadNcdf(file.path(dir, "2t_201902_Mar_format_asc.nc"), "tas")
 #predictand:
-obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_format.nc"), "tas")
+obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_format_asc.nc"), "tas")
 #------------------------------------------
 #VERIFICATION BETWEEN CALIBRATED HINDCAST AND OBSERVATIONS
 
@@ -168,12 +168,12 @@ obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_format.nc"), "tas")
 #------------------------------------------
 #COMPUTE CONTINUOUS RANKED PROBABILITY SCORE (CRPS)
 
-calculate_crps_fcst_raw <- veriApply(verifun = "EnsCrps", fcst = fcst$Data, obs = obs$Data)
+calculate_crps_fcst_raw_new <- veriApply(verifun = "EnsCrps", fcst = fcst$Data, obs = obs$Data)
 
 #Output array calculate_crps_fcst_raw to netcdf file
-metadata <- list(calculate_crps_fcst_raw = list(units = 'unit'))
-attr(calculate_crps_fcst_raw, 'variables') <- metadata
-names(dim(calculate_crps_fcst_raw)) <- c('lon', 'lat', 'time')
+metadata <- list(calculate_crps_fcst_raw_new = list(units = 'unit'))
+attr(calculate_crps_fcst_raw_new, 'variables') <- metadata
+names(dim(calculate_crps_fcst_raw_new)) <- c('lon', 'lat', 'time')
 
 lon <- seq(90, 140)
 dim(lon) <- length(lon)
@@ -187,5 +187,5 @@ metadata <- list(lat = list(units = 'degrees_north'))
 attr(lat, 'variables') <- metadata
 names(dim(lat)) <- 'lat'
 
-crps_fcst_raw_fileName <- "crps_fcst_raw.nc"
-ArrayToNetCDF(list(lon, lat, calculate_crps_fcst_raw), crps_fcst_raw_fileName)
+crps_fcst_raw_new_fileName <- "crps_fcst_raw_new.nc"
+ArrayToNetCDF(list(lon, lat, calculate_crps_fcst_raw_new), crps_fcst_raw_new_fileName)
