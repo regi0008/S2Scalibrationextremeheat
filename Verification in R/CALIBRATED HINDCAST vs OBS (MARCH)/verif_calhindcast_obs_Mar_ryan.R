@@ -145,7 +145,7 @@ grepAndMatch <- function(x, table) {
 dir1 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat"
 #dir1 <- "C:/Users/Work/Desktop/Regine_project/data"
 #predictor (calibrated hincast):
-fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_LR_new.nc"), "tas")
+fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_CCR_new.nc"), "tas")
 
 dir2 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
 #dir2 <- "C:/Users/Work/Desktop/Regine_project/data"
@@ -182,7 +182,7 @@ str(upper.tercile)
 #            main = "ROC AREA (Above-normal) for March",
 #            color.theme = "YlOrRd")
 
-fcst_cal_fileName <- "calLR_March_ROCA_AN.nc"
+fcst_cal_fileName <- "calCCR_March_ROCA_AN_new.nc"
 writeNcdf_verf(upper.tercile, fcst_cal_fileName)
 
 #middle.tercile <- easyVeri2grid(easyVeri.mat = t(roc$cat2),
@@ -198,5 +198,5 @@ lower.tercile <- easyVeri2grid(easyVeri.mat = t(roc$cat1),
                                verifun = "EnsRoca")
 str(lower.tercile)
 
-fcst_cal_fileName <- "calLR_March_ROCA_BN.nc"
+fcst_cal_fileName <- "calCCR_March_ROCA_BN_new.nc"
 writeNcdf_verf(lower.tercile, fcst_cal_fileName)
