@@ -145,12 +145,12 @@ grepAndMatch <- function(x, table) {
 dir1 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat"
 #dir1 <- "C:/Users/Work/Desktop/Regine_project/data"
 #predictor (calibrated hincast):
-fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_LR.nc"), "tas")
+fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_LR_new.nc"), "tas")
 
 dir2 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
 #dir2 <- "C:/Users/Work/Desktop/Regine_project/data"
 #predictand (observation):
-obs <- loadNcdf(file.path(dir2, "2t_era5_Mar_1993_2016_format.nc"), "tas")
+obs <- loadNcdf(file.path(dir2, "2t_era5_Mar_1993_2016_format_asc.nc"), "tas")
 #------------------------------------------
 #VERIFICATION BETWEEN CALIBRATED HINDCAST AND OBSERVATIONS
 
