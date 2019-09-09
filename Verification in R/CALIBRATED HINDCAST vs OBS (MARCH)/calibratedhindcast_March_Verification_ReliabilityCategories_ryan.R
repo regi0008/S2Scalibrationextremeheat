@@ -10,6 +10,8 @@ library(SpecsVerification)
 library(easyVerification)
 library(verification)
 library(RColorBrewer)
+library(sp)
+library(rgdal)
 
 loadNcdf <- function(filePath, varname, tz = 'GMT', ...) {
   nc <- nc_open(filePath)
@@ -111,9 +113,12 @@ dir2 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
 #obs <- loadNcdf(file.path(dir2, "2t_era5_Mar_1993_2016_format_asc.nc"), "tas")
 obs <- loadNcdf(file.path(dir2, "2t_era5_Mar_1993_2016_format.nc"), "tas")
 #------------------------------------------
+
+shape <-readOGR("C:/Users/Work/Desktop/Regine_project/data","test")
+
 #COMPUTE Reliability Categories
 
-test <- reliabilityCategories(fcst_cal, obs, regions = NULL, n.events = 3,
+test <- reliabilityCategories(fcst_cal, obs, regions = shape, n.events = 3,
                               labels = c("Lower", "Middle", "Upper"),
                               diagrams = TRUE, cex0 = 0.5, cex.scale = 20,
                               layout = c(1,3),backdrop.theme = "countries")
