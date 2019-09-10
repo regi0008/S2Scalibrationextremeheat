@@ -147,7 +147,7 @@ grepAndMatch <- function(x, table) {
 dir1 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat"
 #dir1 <- "C:/Users/Work/Desktop/Regine_project/data"
 #predictor (calibrated hincast):
-fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_LR_new.nc"), "tas")
+fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_CCR_new.nc"), "tas")
 
 dir2 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
 #dir2 <- "C:/Users/Work/Desktop/Regine_project/data"
@@ -161,15 +161,6 @@ obs <- loadNcdf(file.path(dir2, "2t_era5_Mar_1993_2016_format_asc.nc"), "tas")
 #2) find the mean of the squared errors
 #3) take the squareroot of that resulting mean
 
-#long method (go through all members.....)
-#mse(as.vector(obs$Data), as.vector(fcst$Data[,,,1]))
-#mse(as.vector(obs$Data), as.vector(fcst$Data[,,,2]))
-#mse(as.vector(obs$Data), as.vector(fcst$Data[,,,3]))
-#......
-#a <- (sapply mse function)
-#b <- a / n, where n is the no. of samples
-#c <- sqrt(b)
-
 #use sapply function method:
 indiv_mse <- sapply(1:25, function(i) {
   mse(fcst_cal$Data[,,,i], obs$Data)
@@ -180,18 +171,44 @@ total_mse <- sum(indiv_mse)
 print(total_mse)
 #based on formula, rmse = sqrt(mse/n), where n is no. of samples.
 #take n = 1.
-rmse_LR <- sqrt(total_mse/1)
-print(rmse_LR)
+rmse_CCR <- sqrt(total_mse/1)
+print(rmse_CCR)
 #------------------------------------------
 #try easyVerification package method: EnsRmse(ens,obs)
 
+#EnsRmse calculates the square root of the ensemble mean squared error
 #EnsRmse(as.matrix(fcst_cal$Data), as.vector(obs$Data)) would give the error below:
 #Error in EnsError(ens = ens, obs = obs, type = "rmse") : 
 #  length(obs) == nrow(ens) is not TRUE
 
 #this prints out a list of 25 values of RMSE for 25 members. Wrong right?
 #RMSE here represents only one value since this is only 1 forecast?
+
 RMSE_Cal <- sapply(1:25, function(i) {
   EnsRmse(as.matrix(fcst_cal$Data[,,,i]), as.vector(obs$Data))
 })
 print(RMSE_Cal)
+#--------------------------------------
+#COMPUTE RMSE
+
+calculate_rmse_fcst_cal_CCR <- veriApply(verifun = "EnsRmse", fcst = fcst_cal$Data, obs = obs$Data)
+
+#Output array calculate_crps_fcst_cal_CCR to netcdf file
+metadata <- list(calculate_rmse_fcst_cal_CCR = list(units = 'unit'))
+attr(calculate_rmse_fcst_cal_CCR, 'variables') <- metadata
+names(dim(calculate_rmse_fcst_cal_CCR)) <- c('lon', 'lat')
+
+lon <- seq(90, 140)
+dim(lon) <- length(lon)
+metadata <- list(lon = list(units = 'degrees_east'))
+attr(lon, 'variables') <- metadata
+names(dim(lon)) <- 'lon'
+
+lat <- seq(-10, 20)
+dim(lat) <- length(lat)
+metadata <- list(lat = list(units = 'degrees_north'))
+attr(lat, 'variables') <- metadata
+names(dim(lat)) <- 'lat'
+
+rmse_fcst_cal_CCR_fileName <- "rmse_fcst_cal_CCR_new.nc"
+ArrayToNetCDF(list(lon, lat, calculate_rmse_fcst_cal_CCR), rmse_fcst_cal_CCR_fileName)
