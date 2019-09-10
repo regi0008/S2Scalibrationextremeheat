@@ -190,7 +190,7 @@ print(rmse_LR)
 #  length(obs) == nrow(ens) is not TRUE
 
 #this prints out a list of 25 values of RMSE for 25 members. Wrong right?
-#RMSE should only represent one value since this is only 1 forecast?
+#RMSE here represents only one value since this is only 1 forecast?
 RMSE_Cal <- sapply(1:25, function(i) {
   EnsRmse(as.matrix(fcst_cal$Data[,,,i]), as.vector(obs$Data))
 })
