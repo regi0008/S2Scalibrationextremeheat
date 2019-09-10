@@ -168,13 +168,16 @@ total_mse <- sum(indiv_mse)
 print(total_mse)
 #based on formula, rmse = sqrt(mse/n), where n is no. of samples.
 #take n = 1.
-rmse_MVA <- sqrt(total_mse/1)
-print(rmse_MVA)
+rmse_raw <- sqrt(total_mse/1)
+print(rmse_raw)
 #------------------------------------------
 #try easyVerification package method: EnsRmse(ens,obs)
 
-#EnsRmse(as.matrix(fcst$Data), as.vector(obs$Data))
+#EnsRmse(as.matrix(fcst$Data), as.vector(obs$Data)) would give the error below:
+#Error in EnsError(ens = ens, obs = obs, type = "rmse") : 
+#  length(obs) == nrow(ens) is not TRUE
 
-sapply(1:25, function(i) {
+RMSE_raw <- sapply(1:25, function(i) {
   EnsRmse(as.matrix(fcst$Data[,,,i]), as.vector(obs$Data))
 })
+print(RMSE_raw)
