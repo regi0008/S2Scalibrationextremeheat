@@ -147,12 +147,12 @@ grepAndMatch <- function(x, table) {
 dir1 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat"
 #dir1 <- "C:/Users/Work/Desktop/Regine_project/data"
 #predictor (calibrated hincast):
-fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_MVA.nc"), "tas")
+fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_LR_new.nc"), "tas")
 
 dir2 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
 #dir2 <- "C:/Users/Work/Desktop/Regine_project/data"
 #predictand (observation):
-obs <- loadNcdf(file.path(dir2, "2t_era5_Mar_1993_2016_format.nc"), "tas")
+obs <- loadNcdf(file.path(dir2, "2t_era5_Mar_1993_2016_format_asc.nc"), "tas")
 #------------------------------------------
 #VALIDATION: ROOT MEAN SQUARE ERROR CALCULATION
 
@@ -180,5 +180,18 @@ total_mse <- sum(indiv_mse)
 print(total_mse)
 #based on formula, rmse = sqrt(mse/n), where n is no. of samples.
 #take n = 1.
-rmse_MVA <- sqrt(total_mse/1)
-print(rmse_MVA)
+rmse_LR <- sqrt(total_mse/1)
+print(rmse_LR)
+#------------------------------------------
+#try easyVerification package method: EnsRmse(ens,obs)
+
+#EnsRmse(as.matrix(fcst_cal$Data), as.vector(obs$Data)) would give the error below:
+#Error in EnsError(ens = ens, obs = obs, type = "rmse") : 
+#  length(obs) == nrow(ens) is not TRUE
+
+#this prints out a list of 25 values of RMSE for 25 members. Wrong right?
+#RMSE should only represent one value since this is only 1 forecast?
+RMSE_Cal <- sapply(1:25, function(i) {
+  EnsRmse(as.matrix(fcst_cal$Data[,,,i]), as.vector(obs$Data))
+})
+print(RMSE_Cal)
