@@ -100,13 +100,14 @@ grepAndMatch <- function(x, table) {
 #need to make sure dimensions of both files are the same:
 #calibrated hindcast: member, time, lat, lon
 #obs_formatted: time, lat, lon
-#dir1 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat"
-dir1 <- "C:/Users/Work/Desktop/Regine_project/data"
+dir1 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat"
+#dir1 <- "C:/Users/Work/Desktop/Regine_project/data"
 #predictor (calibrated hincast):
-fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_CCR_asc.nc"), "tas")
+fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_CCR_new.nc"), "tas")
+#fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_CCR_asc.nc"), "tas")
 
-#dir2 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
-dir2 <- "C:/Users/Work/Desktop/Regine_project/data"
+dir2 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
+#dir2 <- "C:/Users/Work/Desktop/Regine_project/data"
 #predictand (observation):
 obs <- loadNcdf(file.path(dir2, "2t_era5_Mar_1993_2016_format_asc.nc"), "tas")
 #------------------------------------------
