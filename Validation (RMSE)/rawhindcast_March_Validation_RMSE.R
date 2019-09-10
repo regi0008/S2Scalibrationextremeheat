@@ -153,23 +153,19 @@ obs <- loadNcdf(file.path(dir, "2t_era5_Mar_1993_2016_format_asc.nc"), "tas")
   #1) square the errors between fcst$Data (of each member) and obs$Data
   #2) find the mean of the squared errors
   #3) take the squareroot of that resulting mean
-#long method (go through all members.....)
-#mse(as.vector(obs$Data), as.vector(fcst$Data[,,,1]))
-#mse(as.vector(obs$Data), as.vector(fcst$Data[,,,2]))
-#mse(as.vector(obs$Data), as.vector(fcst$Data[,,,3]))
-#......
+
 #use sapply function method:
-indiv_mse <- sapply(1:25, function(i) {
-  mse(fcst$Data[,,,i], obs$Data)
-})
-print(indiv_mse)
+#indiv_mse <- sapply(1:25, function(i) {
+#  mse(fcst$Data[,,,i], obs$Data)
+#})
+#print(indiv_mse)
 #sum up all members
-total_mse <- sum(indiv_mse)
-print(total_mse)
+#total_mse <- sum(indiv_mse)
+#print(total_mse)
 #based on formula, rmse = sqrt(mse/n), where n is no. of samples.
 #take n = 1.
-rmse_raw <- sqrt(total_mse/1)
-print(rmse_raw)
+#rmse_raw <- sqrt(total_mse/1)
+#print(rmse_raw)
 #------------------------------------------
 #try easyVerification package method: EnsRmse(ens,obs)
 
@@ -177,7 +173,31 @@ print(rmse_raw)
 #Error in EnsError(ens = ens, obs = obs, type = "rmse") : 
 #  length(obs) == nrow(ens) is not TRUE
 
-RMSE_raw <- sapply(1:25, function(i) {
-  EnsRmse(as.matrix(fcst$Data[,,,i]), as.vector(obs$Data))
-})
-print(RMSE_raw)
+#RMSE_raw <- sapply(1:25, function(i) {
+#  EnsRmse(as.matrix(fcst$Data[,,,i]), as.vector(obs$Data))
+#})
+#print(RMSE_raw)
+#------------------------------------------
+#COMPUTE RMSE
+
+calculate_rmse_fcst_raw <- veriApply(verifun = "EnsRmse", fcst = fcst$Data, obs = obs$Data)
+
+#Output array calculate_crps_fcst_cal_CCR to netcdf file
+metadata <- list(calculate_rmse_fcst_raw = list(units = 'unit'))
+attr(calculate_rmse_fcst_raw, 'variables') <- metadata
+names(dim(calculate_rmse_fcst_raw)) <- c('lon', 'lat')
+
+lon <- seq(90, 140)
+dim(lon) <- length(lon)
+metadata <- list(lon = list(units = 'degrees_east'))
+attr(lon, 'variables') <- metadata
+names(dim(lon)) <- 'lon'
+
+lat <- seq(-10, 20)
+dim(lat) <- length(lat)
+metadata <- list(lat = list(units = 'degrees_north'))
+attr(lat, 'variables') <- metadata
+names(dim(lat)) <- 'lat'
+
+rmse_fcst_raw_fileName <- "rmse_fcst_raw_new.nc"
+ArrayToNetCDF(list(lon, lat, calculate_rmse_fcst_raw), rmse_fcst_raw_fileName)
