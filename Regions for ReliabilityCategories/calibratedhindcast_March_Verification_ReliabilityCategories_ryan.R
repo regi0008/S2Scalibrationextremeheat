@@ -102,7 +102,7 @@ grepAndMatch <- function(x, table) {
 #obs_formatted: time, lat, lon
 dir1 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat"
 #dir1 <- "C:/Users/Work/Desktop/Regine_project/data"
-#predictor (calibrated hincast):
+#predictor (calibrated hindcast):
 fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_CCR_new.nc"), "tas")
 #fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_CCR_asc.nc"), "tas")
 
@@ -111,8 +111,10 @@ dir2 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
 #predictand (observation):
 obs <- loadNcdf(file.path(dir2, "2t_era5_Mar_1993_2016_format_asc.nc"), "tas")
 #------------------------------------------
-
-shape_file <-readOGR(dir1,"merged_10_regions")
+#read the 10 merged sub-regions shape file from directory
+#shape_file <-readOGR(dir1,"merged_10_regions")
+dir3 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/Regions for ReliabilityCategories"
+shape_file <-readOGR(dir3,"merged_10_regions")
 
 #COMPUTE Reliability Categories
 
