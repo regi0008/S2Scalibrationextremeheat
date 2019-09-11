@@ -102,9 +102,9 @@ grepAndMatch <- function(x, table) {
 #obs_formatted: time, lat, lon
 dir1 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
 #dir1 <- "C:/Users/Work/Desktop/Regine_project/data"
-#predictor (calibrated hindcast):
-fcst_cal <- loadNcdf(file.path(dir1, "2t_201902_Mar_format_asc.nc"), "tas")
-#fcst_cal <- loadNcdf(file.path(dir1, "2t_201902_Mar_format_asc.nc"), "tas")
+#predictor (raw hindcast):
+fcst <- loadNcdf(file.path(dir1, "2t_201902_Mar_format_asc.nc"), "tas")
+#fcst <- loadNcdf(file.path(dir1, "2t_201902_Mar_format_asc.nc"), "tas")
 
 dir2 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
 #dir2 <- "C:/Users/Work/Desktop/Regine_project/data"
@@ -118,7 +118,16 @@ shape_file <-readOGR(dir3,"merged_10_regions")
 
 #COMPUTE Reliability Categories
 
-output <- reliabilityCategories(fcst_cal, obs, regions = shape_file, n.events = 3,
+output <- reliabilityCategories(fcst, obs, regions = shape_file, n.events = 3,
                                 labels = c("Lower", "Middle", "Upper"),
                                 diagrams = TRUE, cex0 = 0.5, cex.scale = 20,
                                 layout = c(1,3),backdrop.theme = "countries")
+
+#------------------------------------------
+#COMPUTE Reliability Diagram
+
+output <- reliabilityCategories(fcst, obs,  n.events = 3,
+                                labels = c("Lower", "Middle", "Upper"),
+                                diagrams = TRUE, cex0 = 0.5, cex.scale = 20,
+                                layout = c(1,3),
+                                return.diagrams = TRUE)
