@@ -141,6 +141,7 @@ grepAndMatch <- function(x, table) {
 #------------------------------------------
 #LOADING OF FILES THROUGH HYFO PACKAGE:
 dir <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
+#dir <- "C:/Users/Work/Desktop/Regine_project/data"
 #predictor (raw hincast):
 fcst <- loadNcdf(file.path(dir, "2t_201902_Mar_format_asc.nc"), "tas")
 #predictand:
