@@ -124,7 +124,8 @@ output <- reliabilityCategories(fcst, obs, regions = shape_file, n.events = 3,
                                 layout = c(1,3),backdrop.theme = "countries")
 
 #------------------------------------------
-#COMPUTE Reliability Diagram
+#To compute Reliability Diagram, similar to code for reliabilityCategories
+#just remove backdrop.theme and add return.diagrams = TRUE
 
 output <- reliabilityCategories(fcst, obs,  n.events = 3,
                                 labels = c("Lower", "Middle", "Upper"),
