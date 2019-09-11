@@ -104,7 +104,7 @@ dir1 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat"
 #dir1 <- "C:/Users/Work/Desktop/Regine_project/data"
 #predictor (calibrated hincast):
 #fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_CCR_asc.nc"), "tas")
-fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_MVA_new.nc"), "tas")
+fcst_cal <- loadNcdf(file.path(dir1, "fcst_cal_LR_new.nc"), "tas")
 
 dir2 <- "C:/Users/regin/Desktop/R/S2Scalibrationextremeheat/loadeR"
 #dir2 <- "C:/Users/Work/Desktop/Regine_project/data"
